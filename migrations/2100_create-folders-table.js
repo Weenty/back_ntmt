@@ -2,7 +2,7 @@
 exports.shorthands = undefined;
 
 exports.up = pgm => {
-    pgm.createTable('files', {
+    pgm.createTable('folders', {
         id: {
             type: 'bigserial',
             primaryKey: true
@@ -10,22 +10,8 @@ exports.up = pgm => {
         userId: {
             type: 'bigint'
         },
-        fileType: {
-            type: 'bigint'
-        },
-        filePath:{
+        name:{
             type:'varchar(500)'
-        },
-        fileMeta:{
-            type:'jsonb'
-        },
-        createdAt:{
-            type:'timestamp with time zone',
-            default:pgm.func('now()')
-        },
-        updatedAt:{
-            type:'timestamp with time zone',
-            default: pgm.func('now()')
         },
         folderId: {
             type: 'bigint'

@@ -12,18 +12,20 @@ async function getRecordBook(object, user) {
                                               r."date",
                                               s."name",
                                               s."summaryHours",
-                                              et."value",
+                                              et."type",
                                               b."name",
                                               b."secondName",
                                               b."patronomyc",
                                               g."groupName",
-                                              g."typeOfStudyingId"
+                                              g."typeOfStudyingId",
+                                              concat_ws(' ', teacher."secondName", teacher."name", teacher."patronomyc") as "teacher"
                                        FROM recordbooks r
                                                 INNER JOIN subjects s on r."subjectId" = s."id"
                                                 INNER JOIN examtypes et on s."examType" = et.id
                                                 INNER JOIN users u on r."userId" = u.id
-                                                INNER JOIN bios b on u."bioId" = b.id
+                                                INNER JOIN bios b on u."id" = b."userId"
                                                 inner join groups g on u."groupId" = g.id
+                                                inner join bios teacher on s."userId" = teacher."userId"
                                        WHERE r."userId" = $1
                                          AND r."semestrId" = $2
                                          AND r.year = $3`

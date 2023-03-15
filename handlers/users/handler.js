@@ -16,7 +16,6 @@ async function getUser(object, user, id) {
   try {
     let resQueryGetUser
     if (id) {
-      
       const queryGetUser = `SELECT u."id", u."login", concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio" 
       FROM users u
       left join bios b on u."id" = b."id"

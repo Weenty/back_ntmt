@@ -1,7 +1,7 @@
 const {pool, constants} = require('../../dependencies')
 const getSchedule = require('../../services/libs/excelparser')
 
-async function getUserSchedule(object, user) {
+async function getUserSchedule(object, user,reply) {
     let data = {
         message: '',
         statusCode: 400

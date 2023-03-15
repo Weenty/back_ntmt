@@ -64,7 +64,7 @@ module.exports = function (fastify, opts, next) {
                 properties: {
                     title: {type: 'string'},
                     text: {type: 'string'},
-                    userid: {type: 'integer'}
+                    userid: {type: 'array'}
                 },
             }
         },

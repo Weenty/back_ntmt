@@ -66,7 +66,14 @@ function uploadFile(folder, file, options = {}) {
     return data
 }
 
+function deleteFiles(filePaths) {
+    filePaths.forEach((filePath) => {
+      fs.unlinkSync(filePath);
+    });
+  }
+
 module.exports = {
     uploadFile: uploadFile,
-    userFiles: userFiles
+    userFiles: userFiles,
+    deleteFiles: deleteFiles,
 }

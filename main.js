@@ -14,7 +14,7 @@ fastify.register(autoload, {
 fastify.register(require('fastify-routes'))
 fastify.register(require('fastify-cors'), {})
 // fastify.register(require('@fastify/multipart'))
-fastify.listen(3001, function (err, address) {
+fastify.listen(3001, '0.0.0.0', (err, address) => {
     if (err) {
         fastify.log.error(err)
         process.exit(1)

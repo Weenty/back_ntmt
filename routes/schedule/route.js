@@ -10,7 +10,7 @@ module.exports = function (fastify, opts, next) {
         url: '/get_schedule',
         
         async handler(request, reply) {
-            const data = await job.getUserSchedule(request.info, reply)
+            const data = await job.getUserSchedule(request.body, request.info, reply)
             return data
         }
     })

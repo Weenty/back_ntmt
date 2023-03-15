@@ -105,5 +105,122 @@ module.exports = function (fastify, opts, next) {
         }
     })
 
+
+    fastify.route({
+        method: 'POST',
+        url: '/delete',
+        schema: {
+            body: {
+                type: 'object',
+                properties: {
+                    fileIds: {type: 'array'}
+                }
+            },
+            response: {
+                400: {
+                    type: 'object',
+                    properties: {
+                        message: {
+                            type: 'string'
+                        },
+                        statusCode: {
+                            type: 'integer'
+                        }
+                    }
+                }
+            }
+        },
+        async handler(request, reply) {
+            const data = await job.deleteFiles(request.body, request.info)
+            if (data.statusCode == 200) {
+                reply.status(200)
+                return data
+            } else {
+                reply.status(400)
+                return data
+            }
+        }
+    })
+
+    fastify.route({
+        method: 'POST',
+        url: '/create_folder',
+        schema: {
+            body: {
+                type: 'object',
+                properties: {
+                    name: {type: 'string'},
+                    folderId: {type: 'integer'}
+                }
+            },
+            response: {
+                400: {
+                    type: 'object',
+                    properties: {
+                        message: {
+                            type: 'string'
+                        },
+                        statusCode: {
+                            type: 'integer'
+                        }
+                    }
+                }
+            }
+        },
+        async handler(request, reply) {
+            const data = await job.createFolder(request.body, request.info)
+            if (data.statusCode == 200) {
+                reply.status(200)
+                return data
+            } else {
+                reply.status(400)
+                return data
+            }
+        }
+    })
+
+
+    fastify.route({
+        method: 'POST',
+        url: '/get_struct',
+        schema: {
+            body: {
+                type: 'object',
+                properties: {
+                    folderId: {type: 'integer'}
+                }
+            },
+            response: {
+                400: {
+                    type: 'object',
+                    properties: {
+                        message: {
+                            type: 'string'
+                        },
+                        statusCode: {
+                            type: 'integer'
+                        }
+                    }
+                }
+            }
+        },
+        async handler(request, reply) {
+            let folderId = request.body.folderId
+            const data = await job.getFolderStruct(request.body, request.info)
+            if (data.statusCode) {
+                reply.status(data.statusCode)
+                return data
+            }
+            else {
+                reply.status(200)
+                return {
+                    message: data,
+                    statusCode: 200,
+                }
+            }
+
+        }
+    })
+
     next()
 }

@@ -70,7 +70,6 @@ module.exports = function (fastify, opts, next) {
               return  await job.login2(request.body,reply)
             }
             const data = await job.login2(request.body,reply)
-            console.log(data)
             if (data.statusCode == 200) {
                 reply.status(200)
                 return data

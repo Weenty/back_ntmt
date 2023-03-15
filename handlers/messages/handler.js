@@ -78,45 +78,64 @@ async function getInfoAboutMessage(object, user, id) {
 
 async function createMessage(object, user) {
   let data = {
-    message: "access denied",
+    message: "",
     statusCode: 400,
   };
+
+  let workWithUser;
+  let lossUsers = []
+  
   const client = await pool.connect();
   const userId = user.userId;
   if (user.roleId != 1) {
+    data = {
+      message: "access denied",
+      statusCode: 400,
+    };
     return data;
   }
   try {
-    const queryCheckUser = "SELECT * FROM users WHERE id = $1";
-    const resqueryCheckUser = await client.query(queryCheckUser, [
-      object.userid,
-    ]);
-
-    if (resqueryCheckUser.rows.length > 0) {
-      const querySelectMessage = `insert into messages ("id", "title", "text", "date", "author")
+    const querySelectMessage = `insert into messages ("id", "title", "text", "date", "author")
       values ((SELECT MAX(id) + 1 FROM messages), $1, $2, 'NOW()', $3) returning "id"`;
-      const resSelectMessage = await client.query(querySelectMessage, [
-        object.title,
-        object.text,
-        userId,
+
+    const messagesuser = `insert into usermessages ("id", "userId", "messageId") values ((SELECT MAX(id) + 1 FROM usermessages), $1, $2)`;
+
+    for (let i = 0; i < object.userid.length; i++) {
+      workWithUser = object.userid[i];
+      const queryCheckUser = "SELECT * FROM users WHERE id = $1";
+      const resqueryCheckUser = await client.query(queryCheckUser, [
+        object.userid[i],
       ]);
 
-      const messagesuser = `insert into usermessages ("id", "userId", "messageId") values ((SELECT MAX(id) + 1 FROM usermessages), $1, $2)`;
+      if (resqueryCheckUser.rows.length > 0) {
+        const resSelectMessage = await client.query(querySelectMessage, [
+          object.title,
+          object.text,
+          userId,
+        ]);
 
-      const resSelectMessage2 = await client.query(messagesuser, [
-        object.userid,
-        resSelectMessage.rows[0].id,
-      ]);
+        const resSelectMessage2 = await client.query(messagesuser, [
+          object.userid[0],
+          resSelectMessage.rows[0].id,
+        ]);
+
+      } else {
+        lossUsers.push(workWithUser);
+      }
+    }
+    if (lossUsers.length > 0) {
       data = {
-        message: "Пользователь успешно добавлен",
-        statusCode: 200,
-      };
-    } else {
-      data = {
-        message: "Указанный пользователь не был найден",
-        statusCode: 400,
+        message: "Пользователи не найдены: " + lossUsers.join(", "),
+        statusCode: 206,
       };
     }
+    else {
+      data = {
+        message: "Сообщения успешно отправлены",
+        statusCode: 200,
+      };
+    }
+    
   } catch (e) {
     console.log(e);
   } finally {
