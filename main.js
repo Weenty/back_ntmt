@@ -8,6 +8,36 @@ const options = {
     sharedSchemaId: '#MultipartFileType',
 }
 fastify.register(require('fastify-multipart'), options)
+
+// Регистрируем fastify-swagger плагин
+fastify.register(require('fastify-swagger'), {
+  routePrefix: '/documentation',
+  swagger: {
+    info: {
+      title: 'Fastify API',
+      description: 'API documentation for Fastify API',
+      version: '1.0.0',
+    },
+    // Установите путь к вашим маршрутам
+    externalDocs: {
+      url: 'https://swagger.io',
+      description: 'Find more info here',
+    },
+    host: 'localhost:3001',
+    schemes: ['http'],
+    consumes: ['application/json'],
+    produces: ['application/json'],
+    securityDefinitions: {
+      bearerAuth: {
+        type: 'apiKey',
+        name: 'Authorization',
+        in: 'header',
+      },
+    },
+  },
+  exposeRoute: true,
+});
+
 fastify.register(autoload, {
     dir: path.join(__dirname, './routes'),
 });
@@ -21,5 +51,3 @@ fastify.listen(3001, '0.0.0.0', (err, address) => {
     }
     fastify.log.info(`server listening on ${address}`)
 })
-
-

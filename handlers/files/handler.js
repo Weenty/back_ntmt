@@ -304,7 +304,7 @@ async function getFolderStruct(object, user) {
     };
     return data
   }
-  if(user.type==4) {
+  if(user.roleId==4) {
     const checkFolder = await client.query(
       `SELECT "id"
       FROM folders

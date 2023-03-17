@@ -66,6 +66,7 @@ module.exports = function (fastify, opts, next) {
                     text: {type: 'string'},
                     userid: {type: 'array'}
                 },
+                required: ['title', 'text', 'userid']
             }
         },
         async handler(request, reply) {
