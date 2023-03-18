@@ -15,7 +15,7 @@ async function uploadFiles(object, user) {
       `SELECT f."id"
       FROM folders f
       left join userroles r on f."id" = r.id
-      WHERE f."id" = $1 AND r.roleId = $2`,
+      WHERE f."id" = $1 AND r."roleId" = $2`,
       [object.folderId, user.roleId]
     );
     if (checkFolder.rows.length == 0) {
