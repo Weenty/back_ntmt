@@ -304,6 +304,7 @@ async function getFolderStruct(object, user) {
     };
     return data
   }
+  console.log(user.roleId)
   if(user.roleId==4) {
     const checkFolder = await client.query(
       `SELECT "id"
@@ -357,14 +358,14 @@ async function createStruct(client, folderId) {
     const childFolderStructures = await Promise.all(
       childFolders.rows.map((childFolder) => createStruct(client, childFolder.id))
     );
-
+      console.log(files.rows)
     const folderStructure = {
       id: folder.rows[0].id,
       name: folder.rows[0].name,
       files: files.rows.map((file) => ({
-        id: file.rows[0].id,
-        path: file.rows[0].filePath,
-        meta: file.rows[0].fileMeta,
+        id: file.id,
+        path: file.filePath,
+        meta: file.fileMeta,
       })),
       folders: childFolderStructures,
     };
