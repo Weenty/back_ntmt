@@ -115,9 +115,9 @@ module.exports = function (fastify, opts, next) {
             body: {
                 type: 'object',
                 properties: {
-                    fileIds: {type: 'array'}
+                    fileId: {type: 'integer'}
                 },
-                required: ['fileIds']
+                required: ['fileId']
             },
             response: {
                 400: {
@@ -182,6 +182,41 @@ module.exports = function (fastify, opts, next) {
         }
     })
 
+    fastify.route({
+        method: 'POST',
+        url: '/delete_folder',
+        schema: {
+            body: {
+                type: 'object',
+                properties: {
+                    folderId: {type: 'integer'}
+                }
+            },
+            response: {
+                400: {
+                    type: 'object',
+                    properties: {
+                        message: {
+                            type: 'string'
+                        },
+                        statusCode: {
+                            type: 'integer'
+                        }
+                    }
+                }
+            }
+        },
+        async handler(request, reply) {
+            const data = await job.deleteFolder(request.body, request.info)
+            if (data.statusCode == 200) {
+                reply.status(200)
+                return data
+            } else {
+                reply.status(400)
+                return data
+            }
+        }
+    })
 
     fastify.route({
         method: 'POST',

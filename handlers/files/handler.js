@@ -9,18 +9,14 @@ async function uploadFiles(object, user) {
   let uploadsFiles = [];
   let wasBegin = false;
   try {
-    // "SELECT * FROM folders WHERE folderId = $1 AND userId = $2"
-
     const checkFolder = await client.query(
-      `SELECT f."id"
-      FROM folders f
-      left join userroles r on f."id" = r.id
-      WHERE f."id" = $1 AND r."roleId" = $2`,
-      [object.folderId, user.roleId]
+      `SELECT * FROM folders WHERE "userId" = $1 AND "id" = $2`,
+      [user.userId, object.folderId]
     );
+      //todo: Сделать по роли доступ 
     if (checkFolder.rows.length == 0) {
       data = {
-        message: `Папка ${folderId} не найдена или вы не имеете к ней доступа.`,
+        message: `Папка ${object.folderId} не найдена или вы не имеете к ней доступа.`,
         statusCode: 400,
       };
       return data;
@@ -94,7 +90,7 @@ async function uploadFiles(object, user) {
 
 async function createFolder(object, user) {
   const queryAddFolder = `insert into folders ("id", "userId", "name", "folderId")
-      values ((SELECT MAX(id) + 1 FROM folders), $1, $2, $3)`;
+      values ((SELECT MAX(id) + 1 FROM folders), $1, $2, $3) RETURNING *`;
   let data = {
     message: "",
     statusCode: 400,
@@ -105,8 +101,8 @@ async function createFolder(object, user) {
       `SELECT * FROM folders WHERE "userId" = $1 AND "id" = $2`,
       [user.userId, object.folderId]
     );
-    //todo: Сделать доступ для создания папок.
-    if (checkFolder.rows.length == 0) {
+
+    if (checkFolder.rows.length == 0 && !(object.folderId == 1 && (user.roleId == 1 || user.roleId == 3))) {
       data = {
         message: `Папка ${object.folderId} не найдена или вы не имеете к ней доступа.`,
         statusCode: 400,
@@ -120,7 +116,7 @@ async function createFolder(object, user) {
       object.folderId,
     ]);
     data = {
-      message: "Папка успешно создана.",
+      message:  resQueryAddFolder.rows,
       statusCode: 200,
     };
   } catch (e) {
@@ -218,21 +214,54 @@ async function downloadFile(object, user) {
   return data;
 }
 
+async function deleteFolderRecursive(folder, userId, client) {
+  // Удаляем файлы внутри папки
+  for (const file of folder.files) {
+    await client.query(`DELETE FROM files WHERE id = $1 AND "userId" = $2`, [file.id, userId]);
+    fs.unlinkSync(file.path);
+  }
+
+  // Удаляем вложенные папки
+  for (const subfolder of folder.folders) {
+    await deleteFolderRecursive(subfolder, userId, client);
+  }
+
+  // Удаляем саму папку
+  await client.query(`DELETE FROM folders WHERE id = $1 AND "userId" = $2`, [folder.id, userId]);
+}
+
 async function deleteFolder(object, user) {
-  fileIds = object.fileId;
-  userId = user.userId;
   let data = {
     message: "",
     statusCode: 400,
   };
+  const folderId = object.folderId;
+  const userId = user.userId;
   const client = await pool.connect();
+  const checkFolder = await client.query(
+    `SELECT "id"
+    FROM folders
+    WHERE "id" = $1 AND "userId" = $2`,
+    [folderId, user.userId]
+  );
+  if (checkFolder.rows.length == 0) {
+    data = {
+      message: "Папка не найдена или вы не имеете к ней доступа",
+      statusCode: 400,
+    };
+    return data
+  }
+  struct = await createStruct(client, folderId);
+  
+  
   try {
-    const folder = await client.query(`SELECT * FROM folders WHERE "id" = $1 AND "userId" = $2`, [
-      folderId,userId
-    ]);
-    if (folder.rows.length > 0) {
-      //todo: Сделать удаление файлов и папок
-    }
+    // Рекурсивно удаляем все папки и файлы из базы данных и файловой системы
+    await deleteFolderRecursive(struct, userId, client);
+
+    data = {
+      message: "Folder successfully deleted",
+      statusCode: 200,
+    };
   } catch (e) {
     data = {
       message: e.message,
@@ -245,8 +274,9 @@ async function deleteFolder(object, user) {
 }
 
 
+
 async function deleteFiles(object, user) {
-  fileIds = object.fileId;
+  fileId = object.fileId;
   userId = user.userId;
   let data = {
     message: "",
@@ -254,15 +284,23 @@ async function deleteFiles(object, user) {
   };
   const client = await pool.connect();
   try {
-    const queryGetFiles = `SELECT "filePath" FROM files WHERE "id" = ANY($1::int[]) AND "userId" = $2`;
-    const resGetFiles = await client.query(queryGetFiles, [fileIds, userId]);
+    const queryGetFiles = `SELECT "filePath" FROM files WHERE "id" = $1 AND "userId" = $2`;
+    const resGetFiles = await client.query(queryGetFiles, [fileId, userId]);
+
+    if (resGetFiles.rows.length == 0) {
+      data = {
+        message: "Файлы не были найдены или вы не имеете к ним доступа",
+        statusCode: 400,
+      };
+      return data
+    }
     const filePaths = resGetFiles.rows.map((file) => file.filePath);
 
     await Promise.all([
       filesystem.deleteFiles(filePaths),
       client.query(
-        'DELETE FROM files WHERE "id" = ANY($1::int[]) AND "userId" = $2',
-        [fileIds, userId]
+        'DELETE FROM files WHERE "id" = $1 AND "userId" = $2',
+        [fileId, userId]
       ),
     ]);
     await client.query("COMMIT");
@@ -304,7 +342,7 @@ async function getFolderStruct(object, user) {
     };
     return data
   }
-  console.log(user.roleId)
+
   if(user.roleId==4) {
     const checkFolder = await client.query(
       `SELECT "id"
@@ -379,4 +417,5 @@ module.exports = {
   deleteFiles: deleteFiles,
   createFolder: createFolder,
   getFolderStruct: getFolderStruct,
+  deleteFolder:deleteFolder
 };
