@@ -13,11 +13,13 @@ module.exports = function (fastify, opts, next) {
             body: {
                 type: 'object',
                 properties: {
+                    folderId: {type: 'integer'},
                     files: {
                         type: 'array',
                         items: fastify.getSchema('MultipartFileType')
                     }
-                }
+                },
+                required: ['folderId']
             },
             response: {
                 400: {
