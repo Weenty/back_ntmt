@@ -17,6 +17,7 @@ async function selectRecordBook(object, user) {
     }
     const checkRecord = await client.query(
       `SELECT r."endMark",
+        r."id",
         r."date",
         s."name",
         s."summaryHours",
@@ -24,6 +25,7 @@ async function selectRecordBook(object, user) {
         b."name",
         b."secondName",
         b."patronomyc",
+        s."name",
         g."groupName",
         g."typeOfStudyingId",
         concat_ws(' ', teacher."secondName", teacher."name", teacher."patronomyc") as "teacher"
@@ -194,6 +196,8 @@ async function getRecordBook(object, user) {
   const userId = user.userId;
   try {
     const querySelectRecordBook = `SELECT r."endMark",
+                                              r."id",
+                                              s."name",
                                               r."date",
                                               s."name",
                                               s."summaryHours",

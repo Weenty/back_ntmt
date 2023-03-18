@@ -114,7 +114,8 @@ module.exports = function (fastify, opts, next) {
                 type: 'object',
                 properties: {
                     fileIds: {type: 'array'}
-                }
+                },
+                required: ['fileIds']
             },
             response: {
                 400: {
