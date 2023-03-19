@@ -190,7 +190,8 @@ module.exports = function (fastify, opts, next) {
                 type: 'object',
                 properties: {
                     folderId: {type: 'integer'}
-                }
+                },
+                required: ['folderId']
             },
             response: {
                 400: {
@@ -226,7 +227,8 @@ module.exports = function (fastify, opts, next) {
                 type: 'object',
                 properties: {
                     folderId: {type: 'integer'}
-                }
+                },
+                required: ['folderId']
             },
             response: {
                 400: {

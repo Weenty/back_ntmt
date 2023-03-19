@@ -8,7 +8,7 @@ const options = {
     sharedSchemaId: '#MultipartFileType',
 }
 fastify.register(require('fastify-multipart'), options)
-
+fastify.register(require('fastify-cors'), {})
 // Регистрируем fastify-swagger плагин
 fastify.register(require('fastify-swagger'), {
   routePrefix: '/documentation',
@@ -42,7 +42,7 @@ fastify.register(autoload, {
     dir: path.join(__dirname, './routes'),
 });
 fastify.register(require('fastify-routes'))
-fastify.register(require('fastify-cors'), {})
+
 // fastify.register(require('@fastify/multipart'))
 fastify.listen(3001, '0.0.0.0', (err, address) => {
     if (err) {
