@@ -78,12 +78,17 @@ async function addSubjct(object, user) {
 
     try {
         const checkSubject = await client.query(`SELECT * FROM subjects WHERE "id" = $1`, [subjectId])
-        if (checkExamType.rows.length == 0) {
+        if (checkSubject.rows.length == 0) {
             data = {
                 message: `Предмет ${subjectId} не найден`,
                 statusCode: 400,
             }
             return data
+        }
+        const deleteQuery = await client.query(`DELETE FROM subjects WHERE id = $1`, [subjectId])
+        data = {
+            message: 'Успешное удаление',
+            statusCode: 200,
         }
     }
     catch (err) {
@@ -100,5 +105,6 @@ async function addSubjct(object, user) {
 
 module.exports = {
     addSubjct:addSubjct,
+    deleteSubject:deleteSubject,
   };
   
