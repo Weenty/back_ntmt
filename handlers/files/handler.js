@@ -402,8 +402,13 @@ async function createStruct(client, folderId) {
       name: folder.rows[0].name,
       files: files.rows.map((file) => ({
         id: file.id,
-        path: file.filePath,
-        meta: file.fileMeta,
+        userid: file.userId,
+        fileType: file.fileType,
+        filePath: file.filePath,
+        fileMeta: file.fileMeta,
+        createdAt: file.createdAt,
+        updatedAt: file.updatedAt,
+        folderId: file.folderId
       })),
       folders: childFolderStructures,
     };
