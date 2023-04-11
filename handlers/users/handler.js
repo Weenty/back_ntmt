@@ -16,16 +16,18 @@ async function getUser(object, user, id) {
   try {
     let resQueryGetUser
     if (id) {
-      const queryGetUser = `SELECT u."id", u."login", concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio" 
+      const queryGetUser = `SELECT u."id", ur.roleId, u."login", concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio" 
       FROM users u
       left join bios b on u."id" = b."id"
+      left join userroles ur on u.id = ur.userId
       WHERE u."id" = $1`;
       resQueryGetUser = await client.query(queryGetUser, [id]);
     }
     else {
 
-      const queryGetUser = `SELECT u."id", u."login", concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio" 
+      const queryGetUser = `SELECT u."id", u."login", ur.roleId, concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio" 
       FROM users u
+      left join userroles ur on u.id = ur.userId
       left join bios b on u."id" = b."id"`;
       resQueryGetUser = await client.query(queryGetUser, []);
     }
