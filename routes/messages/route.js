@@ -15,7 +15,8 @@ module.exports = function (fastify, opts, next) {
                 properties: {
                     list: {type: 'string'}
                 }
-            }
+            },
+            tags: ['messages']
         },
         async handler(request, reply) {
             const list = request.params.list
@@ -39,7 +40,8 @@ module.exports = function (fastify, opts, next) {
                 properties: {
                     id: {type: 'string'}
                 }
-            }
+            },
+            tags: ['messages']
         },
         async handler(request, reply) {
             const id = request.params.id
@@ -67,7 +69,8 @@ module.exports = function (fastify, opts, next) {
                     userid: {type: 'array'}
                 },
                 required: ['title', 'text', 'userid']
-            }
+            },
+            tags: ['messages']
         },
         async handler(request, reply) {
             const data = await job.createMessage(request.body, request.info)

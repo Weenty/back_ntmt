@@ -8,7 +8,9 @@ module.exports = function (fastify, opts, next) {
     fastify.route({
         method: 'GET',
         url: '/get_schedule',
-        
+        schema: {
+            tags: ['schedule']
+        },
         async handler(request, reply) {
             const data = await job.getUserSchedule(request.body, request.info, reply)
             return data

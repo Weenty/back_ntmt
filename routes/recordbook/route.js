@@ -15,6 +15,7 @@ module.exports = function (fastify, opts, next) {
                     year: {type: 'integer'}
                 }
             },
+            tags: ['recorkbook'],
             response: {
                 400: {
                     type: 'object',
@@ -47,6 +48,7 @@ module.exports = function (fastify, opts, next) {
                     userId: {type: 'integer'},
                 }
             },
+            tags: ['recorkbook'],
             response: {
                 400: {
                     type: 'object',
@@ -93,6 +95,7 @@ module.exports = function (fastify, opts, next) {
                 },
                 required: ['endMark', 'date', 'userId', 'subjectId', 'semestrId', 'year']
             },
+            tags: ['recorkbook'],
             response: {
                 400: {
                     type: 'object',
@@ -126,6 +129,7 @@ module.exports = function (fastify, opts, next) {
                 },
                 required: ['recordId']
             },
+            tags: ['recorkbook'],
             response: {
                 400: {
                     type: 'object',
@@ -174,6 +178,7 @@ module.exports = function (fastify, opts, next) {
                 },
                 required: ['recordId']
             },
+            tags: ['recorkbook'],
             response: {
                 400: {
                     type: 'object',

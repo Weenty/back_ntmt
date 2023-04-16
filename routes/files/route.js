@@ -21,6 +21,7 @@ module.exports = function (fastify, opts, next) {
                 },
                 required: ['folderId']
             },
+            tags: ['files'],
             response: {
                 400: {
                     type: 'object',
@@ -63,7 +64,8 @@ module.exports = function (fastify, opts, next) {
                         }
                     }
                 }
-            }
+            },
+            tags: ['files']
         },
         async handler(request, reply) {
             const data = await job.getUserFiles(request.body, request.info)
@@ -87,7 +89,8 @@ module.exports = function (fastify, opts, next) {
                     fileId:{type:'integer'}
                 },
                 required:['fileId']
-            }
+            },
+            tags: ['files']
         },
         async handler(request,reply){
             const data = await job.downloadFile(request.body,request.info)
@@ -119,6 +122,7 @@ module.exports = function (fastify, opts, next) {
                 },
                 required: ['fileId']
             },
+            tags: ['files'],
             response: {
                 400: {
                     type: 'object',
@@ -168,7 +172,8 @@ module.exports = function (fastify, opts, next) {
                         }
                     }
                 }
-            }
+            },
+            tags: ['files']
         },
         async handler(request, reply) {
             const data = await job.createFolder(request.body, request.info)
@@ -205,7 +210,8 @@ module.exports = function (fastify, opts, next) {
                         }
                     }
                 }
-            }
+            },
+            tags: ['files']
         },
         async handler(request, reply) {
             const data = await job.deleteFolder(request.body, request.info)
@@ -230,6 +236,7 @@ module.exports = function (fastify, opts, next) {
                 },
                 required: ['folderId']
             },
+            tags: ['files'],
             response: {
                 400: {
                     type: 'object',

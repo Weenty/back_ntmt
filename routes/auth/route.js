@@ -63,7 +63,8 @@ module.exports = function (fastify, opts, next) {
                     password: {type: 'string'}
                 },
                 required: ["type", "login", "password"]
-            }
+            },
+            tags: ['Authentication']
         },
         async handler(request, reply) {
             if(request.body.type == 1){

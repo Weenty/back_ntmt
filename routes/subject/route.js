@@ -14,7 +14,8 @@ module.exports = function (fastify, opts, next) {
                 properties: {
                     id: {type: ['integer', 'string']}
                 }
-            }
+            },
+            tags: ['subjects'],
         },
         async handler(request, reply) {
             const id = request.params.id
@@ -43,6 +44,7 @@ module.exports = function (fastify, opts, next) {
                 },
                 required: ['name', 'teacherId', 'hours', 'examType']
             },
+            tags: ['subjects'],
             response: {
                 400: {
                     type: 'object',
@@ -77,6 +79,7 @@ module.exports = function (fastify, opts, next) {
                 },
                 required: ['subjectId']
             },
+            tags: ['subjects'],
             response: {
                 400: {
                     type: 'object',
@@ -114,6 +117,7 @@ module.exports = function (fastify, opts, next) {
                 },
                 required: ['subjectId']
             },
+            tags: ['subjects'],
             response: {
                 400: {
                     type: 'object',

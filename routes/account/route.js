@@ -9,6 +9,9 @@ module.exports = function (fastify, opts, next) {
     fastify.route({
         url:'/user/info',
         method:'POST',
+        schema: {
+            tags: ['users and accounts']
+        },
         async handler(request,reply){
             const data = await job.showUserInfo(request.body,request.info)
             if(data.statusCode !== 200){

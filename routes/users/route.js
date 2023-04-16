@@ -15,7 +15,8 @@ module.exports = function (fastify, opts, next) {
                 properties: {
                     id: {type: ['integer', 'string']}
                 }
-            }
+            },
+            tags: ['users and accounts'],
         },
         async handler(request, reply) {
             const id = request.params.id
