@@ -148,5 +148,53 @@ module.exports = function (fastify, opts, next) {
         }
     })
 
+
+    fastify.route({
+        method: 'POST',
+        url: '/update',
+        schema: {
+            body: {
+                type: 'object',
+                properties: {
+                    recordId: {type: 'integer'},
+                    endMark: {type: 'string'},
+                    date: {
+                        type: 'string',
+                        format: 'date-time'
+                      },
+                    userId: {type: 'integer'},
+                    subjectId: {type: 'integer'}, 
+                    semestrId: {type: 'integer'},
+                    year: {
+                        type: 'integer',
+                        maximum: 9999,
+                        minimum: 1000
+                      }
+                    
+                },
+                required: ['recordId']
+            },
+            response: {
+                400: {
+                    type: 'object',
+                    properties: {
+                        message: {type: 'string'},
+                        statusCode: {type: 'integer'}
+                    }
+                }
+            }
+        },
+        async handler(request, reply) {
+            const data = await job.updateRecordBook(request.body, request.info)
+            if (data.statusCode == 200) {
+                reply.status(200)
+                return data
+            } else {
+                reply.status(400)
+                return data
+            }
+        }
+    })
+
     next()
 }

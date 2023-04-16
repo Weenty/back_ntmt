@@ -4,6 +4,31 @@ module.exports = function (fastify, opts, next) {
     fastify.addHook('onRequest', async (request, reply) => {
         return await checkAccessHook(request, reply);
     });
+
+    fastify.route({
+        method: 'GET',
+        url: '/:id?',
+        schema: {
+            params: {
+                type: 'object',
+                properties: {
+                    id: {type: ['integer', 'string']}
+                }
+            }
+        },
+        async handler(request, reply) {
+            const id = request.params.id
+            const data = await job.getSubject(request.body, request.info, id)
+            if (data.statusCode == 200) {
+                reply.status(200)
+                return data
+            } else {
+                reply.status(400)
+                return data
+            }
+        }
+    })
+
     fastify.route({
         method: 'POST',
         url: '/create',
@@ -64,6 +89,43 @@ module.exports = function (fastify, opts, next) {
         },
         async handler(request, reply) {
             const data = await job.deleteSubject(request.body, request.info)
+            if (data.statusCode == 200) {
+                reply.status(200)
+                return data
+            } else {
+                reply.status(400)
+                return data
+            }
+        }
+    })
+
+    fastify.route({
+        method: 'POST',
+        url: '/update',
+        schema: {
+            body: {
+                type: 'object',
+                properties: {
+                    subjectId: {type: 'integer'},
+                    name: {type: 'string'},
+                    summaryHours: {type: 'integer'},
+                    examType: {type: 'integer'}, 
+                    teacherId: {type: 'integer'},
+                },
+                required: ['subjectId']
+            },
+            response: {
+                400: {
+                    type: 'object',
+                    properties: {
+                        message: {type: 'string'},
+                        statusCode: {type: 'integer'}
+                    }
+                }
+            }
+        },
+        async handler(request, reply) {
+            const data = await job.updateSubject(request.body, request.info)
             if (data.statusCode == 200) {
                 reply.status(200)
                 return data

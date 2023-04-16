@@ -28,7 +28,7 @@ module.exports = function (fastify, opts, next) {
                 return data
             }
         }
-    })//Получение всех сообщений пользователя
+    })
 
     next()
 }

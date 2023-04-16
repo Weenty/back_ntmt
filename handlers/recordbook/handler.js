@@ -244,8 +244,145 @@ async function getRecordBook(object, user) {
   return data;
 }
 
+
+async function updateRecordBook(object, user) {
+  let data = {
+    message: "",
+    statusCode: 400,
+  };
+  const endMark = object.endMark;
+  const date = object.date;
+  const userId = object.userId;
+  const subjectId = object.subjectId;
+  const semestrId = object.semestrId;
+  const year = object.year;
+  const recordId = object.recordId;
+
+  const client = await pool.connect();
+  try {
+    if (user.roleId != 1) {
+      data = {
+        message: "access denied",
+        statusCode: 403,
+      };
+      return data;
+    }
+
+    const checkRecord = await client.query(
+      `SELECT * FROM recordbooks WHERE id = $1`,
+      [recordId]
+    );
+    if (checkRecord.rows.length == 0) {
+      data = {
+        message: `Запись ${recordId} в зачетной книжке не найдена`,
+        statusCode: 400,
+      };
+      return data;
+    }
+
+    const updates = [];
+    const values = [];
+
+    if (endMark) {
+      updates.push(`"endMark" = $${updates.length + 1}`);
+      values.push(endMark);
+    }
+
+    if (date) {
+      updates.push(`"date" = $${updates.length + 1}`);
+      values.push(date);
+    }
+
+    if (userId) {
+      const checkUserId = await client.query(
+        `SELECT * FROM users WHERE "id" = $1`,
+        [userId]
+      );
+      if (checkUserId.rows.length == 0) {
+        data = {
+          message: "Указанный пользователь не был найден",
+          statusCode: 400,
+        };
+        return data;
+      }
+
+      updates.push(`"userId" = $${updates.length + 1}`);
+      values.push(userId);
+    }
+
+    if (subjectId) {
+      const checkSubjectId = await client.query(
+        `SELECT * FROM subjects WHERE "id" = $1`,
+        [subjectId]
+      );
+      if (checkSubjectId.rows.length == 0) {
+        data = {
+          message: "Указанный предмет не был найден",
+          statusCode: 400,
+        };
+        return data;
+      }
+
+      updates.push(`"subjectId" = $${updates.length + 1}`);
+      values.push(subjectId);
+    }
+
+    if (semestrId) {
+      const checkSemestrId = await client.query(
+        `SELECT * FROM semesters WHERE "id" = $1`,
+        [semestrId]
+      );
+      if (checkSemestrId.rows.length == 0) {
+        data = {
+          message: "Указанный семестр не был найден",
+          statusCode: 400,
+        };
+        return data;
+      }
+      updates.push(`"semestrId" = $${updates.length + 1}`);
+      values.push(semestrId);
+    }
+
+    if (year) {
+      updates.push(`"year" = $${updates.length + 1}`);
+      values.push(year);
+    }
+
+    if (updates.length == 0) {
+      data = {
+        message: "Нет данных для обновления.",
+        statusCode: 400,
+      };
+      return data;
+    }
+
+    const updateRecord = await client.query(
+      `UPDATE recordbooks SET ${updates.join(
+        ","
+      )} WHERE id = $${values.length + 1} RETURNING *`,
+      [...values, recordId]
+    );
+
+    data = {
+      message: updateRecord.rows,
+      statusCode: 200,
+    };
+  } catch (e) {
+    console.error(e);
+    data = {
+      message: e.message,
+      statusCode: 400,
+    };
+  } finally {
+    client.release();
+    console.log("client.release()");
+  }
+  return data;
+}
+
 module.exports = {
   getRecordBook: getRecordBook,
+  updateRecordBook: updateRecordBook,
   createRecordBook: createRecordBook,
   deleteRecordBook: deleteRecordBook,
   selectRecordBook: selectRecordBook,
