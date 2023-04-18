@@ -265,7 +265,41 @@ module.exports = function (fastify, opts, next) {
                     statusCode: 200,
                 }
             }
-
+        }
+    })
+    
+    fastify.route({
+        method: 'GET',
+        url: '/get_my_folder',
+        schema: {
+            tags: ['files'],
+            response: {
+                400: {
+                    type: 'object',
+                    properties: {
+                        message: {
+                            type: 'string'
+                        },
+                        statusCode: {
+                            type: 'integer'
+                        }
+                    }
+                }
+            }
+        },
+        async handler(request, reply) {
+            const data = await job.getMyFolder(request.body, request.info)
+            if (data.statusCode) {
+                reply.status(data.statusCode)
+                return data
+            }
+            else {
+                reply.status(200)
+                return {
+                    message: data,
+                    statusCode: 200,
+                }
+            }
         }
     })
 

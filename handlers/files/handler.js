@@ -415,6 +415,64 @@ async function createStruct(client, folderId) {
     return client, folderStructure;
 }
 
+async function getMyFolder(object, user) {
+  userId = user.userId;
+  let data = {
+    message: "",
+    statusCode: 400,
+  };
+  const client = await pool.connect();
+  try {
+    const getFolder = await client.query(
+      `SELECT id FROM folders WHERE "userId" = $1 AND "folderId" is null`,
+      [userId]
+    );
+    if (getFolder.rows.length > 0) {
+      data = {
+        message: await createStruct(client, getFolder.rows[0].id),
+        statusCode: 200,
+      };
+    }
+    else {
+      data = {
+        message: "Папка не найдена или вы не имеете к ней доступа",
+        statusCode: 400,
+      };
+    }
+  } catch (e) {
+    await client.query("ROLLBACK");
+    data = {
+      message: e.message,
+      statusCode: 400,
+    };
+  } finally {
+    client.release();
+  }
+  return data;
+}
+
+async function getFoldersStudents(object, user) {
+  userId = user.userId;
+  group = object.group
+  let data = {
+    message: "",
+    statusCode: 400,
+  };
+  const client = await pool.connect();
+  try {
+    
+  } catch (e) {
+    await client.query("ROLLBACK");
+    data = {
+      message: e.message,
+      statusCode: 400,
+    };
+  } finally {
+    client.release();
+  }
+  return data;
+}
+
 module.exports = {
   uploadFiles: uploadFiles,
   getUserFiles: getUserFiles,
@@ -422,5 +480,6 @@ module.exports = {
   deleteFiles: deleteFiles,
   createFolder: createFolder,
   getFolderStruct: getFolderStruct,
-  deleteFolder:deleteFolder
+  deleteFolder:deleteFolder,
+  getMyFolder:getMyFolder
 };
