@@ -46,6 +46,14 @@ exports.up = async pgm => {
         throw 'Ошибка при создании пользователя'
     }
 
+    const student2 = await pgm.db.query(`insert into users ("typesId", "login", "password", "groupId")
+                                     values (2, 'student2', '$2a$10$yqkkq19EglFc68MuNEHifuFGYfUnc9oaSlgfvp/SrnLu4dR4uvdHG',
+                                             ${group2.rows[0].id})
+                                     returning "id"`);
+    if (student2.rowCount === 0 || student2.rows.length === 0) {
+        throw 'Ошибка при создании пользователя'
+    }
+
     const bio = await pgm.db.query(`insert into bios ("name", "secondName", "patronomyc", "grant", "userId", "flura")
                                     values ('Иван', 'Иванов', 'Иванович', 2000, ${user.rows[0].id}, now())`)
     if (bio.rowCount === 0) {
@@ -62,6 +70,11 @@ exports.up = async pgm => {
     if (bio3.rowCount === 0) {
         throw 'Ошибка при создании био'
     }
+    const bio4 = await pgm.db.query(`insert into bios ("name", "secondName", "patronomyc", "grant", "userId", "flura")
+                                    values ('Виктория', 'Бронникова', 'Ульяновна', 22000, ${student2.rows[0].id}, now())`)
+    if (bio4.rowCount === 0) {
+        throw 'Ошибка при создании био'
+    }
 
     const roles = await pgm.db.query(`insert into roles (value) values ('Администратор') returning id`)
     const roles2 = await pgm.db.query(`insert into roles (value) values ('Родитель') returning id`)
@@ -71,6 +84,7 @@ exports.up = async pgm => {
     const userRole = await pgm.db.query(`insert into userroles ("userId", "roleId") values (${user.rows[0].id},${roles.rows[0].id})`)
     const userRole2 = await pgm.db.query(`insert into userroles ("userId", "roleId") values (${prep.rows[0].id},${roles3.rows[0].id})`)
     const userRole3 = await pgm.db.query(`insert into userroles ("userId", "roleId") values (${student.rows[0].id},${roles4.rows[0].id})`)
+    const userRole4 = await pgm.db.query(`insert into userroles ("userId", "roleId") values (${student2.rows[0].id},${roles4.rows[0].id})`)
 };
 
 exports.down = pgm => {

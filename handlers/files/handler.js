@@ -1,5 +1,8 @@
 const { filesystem, pool, constants } = require("../../dependencies");
 const fs = require("fs");
+const { group } = require("console");
+const { get } = require("http");
+const { Integer } = require("read-excel-file");
 async function uploadFiles(object, user) {
   let data = {
     message: "",
@@ -452,15 +455,43 @@ async function getMyFolder(object, user) {
 }
 
 async function getFoldersStudents(object, user) {
-  userId = user.userId;
-  group = object.group
   let data = {
     message: "",
     statusCode: 400,
   };
+  let arr = []
+  const group = object.group;
+  const role = parseInt(user.roleId)
+  if (role == 4 || role == 2) {
+    data = {
+      message: "access denied",
+      statusCode: 403
+    }
+    return data
+  }
   const client = await pool.connect();
   try {
-    
+    let getFolders = `SELECT ur."userId", f."id" 
+    FROM folders f
+    left join userroles ur on ur."userId" = f."userId"
+    WHERE f."folderId" is null AND ur."roleId" = 4`
+    if (group) {
+      arr.push(group)
+      getFolders = `SELECT ur."userId", f."id" 
+    FROM folders f
+    left join userroles ur on ur."userId" = f."userId"
+    left join users u on u."id" = ur."userId"
+    left join groups g on g."id" = u."groupId"
+    WHERE f."folderId" is null AND ur."roleId" = 4 AND g."code" = $1`
+    }
+    const queryGetFolders = await client.query(getFolders, arr)
+    const getStructFolders = await Promise.all(
+      queryGetFolders.rows.map((folder) => createStruct(client, folder.id))
+    );
+    data = {
+      message: getStructFolders,
+      statusCode: 200
+    }
   } catch (e) {
     await client.query("ROLLBACK");
     data = {
@@ -481,5 +512,6 @@ module.exports = {
   createFolder: createFolder,
   getFolderStruct: getFolderStruct,
   deleteFolder:deleteFolder,
-  getMyFolder:getMyFolder
+  getMyFolder:getMyFolder,
+  getFoldersStudents:getFoldersStudents
 };

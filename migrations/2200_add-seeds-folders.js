@@ -17,6 +17,20 @@ exports.up = async pgm => {
         throw 'Ошибка при добавлении папок'
     }
 
+
+    const folders3 = await pgm.db.query(`insert into folders ("id", "userId", "name", "folderId")
+                                      values ('3', '3', 'student', null)
+                                      returning "id"`)
+    if (folders3.rowCount === 0 || folders3.rows.length === 0) {
+        throw 'Ошибка при добавлении папок'
+    }
+
+    const folders4 = await pgm.db.query(`insert into folders ("id", "userId", "name", "folderId")
+                                      values ('4', '4', 'Бронникова Виктория', null)
+                                      returning "id"`)
+    if (folders4.rowCount === 0 || folders4.rows.length === 0) {
+        throw 'Ошибка при добавлении папок'
+    }
 };
 
 exports.down = pgm => {

@@ -303,5 +303,47 @@ module.exports = function (fastify, opts, next) {
         }
     })
 
+
+    fastify.route({
+        method: 'POST',
+        url: '/get_student_folders',
+        schema: {
+            body: {
+                type: 'object',
+                properties: {
+                    group: {type: 'string'}
+                },
+            },
+            tags: ['files'],
+            response: {
+                400: {
+                    type: 'object',
+                    properties: {
+                        message: {
+                            type: 'string'
+                        },
+                        statusCode: {
+                            type: 'integer'
+                        }
+                    }
+                }
+            }
+        },
+        async handler(request, reply) {
+            const data = await job.getFoldersStudents(request.body, request.info)
+            if (data.statusCode) {
+                reply.status(data.statusCode)
+                return data
+            }
+            else {
+                reply.status(200)
+                return {
+                    message: data,
+                    statusCode: 200,
+                }
+            }
+        }
+    })
+
     next()
 }

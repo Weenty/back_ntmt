@@ -80,7 +80,6 @@ async function registration(object) {
   };
   const client = await pool.connect();
   try {
-    //Проверяем, занят ли логин
     const querySelectLogin = `SELECT *
                                   FROM users
                                   WHERE login = $1`;
