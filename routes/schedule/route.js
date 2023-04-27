@@ -6,9 +6,19 @@ module.exports = function (fastify, opts, next) {
     });
 
     fastify.route({
-        method: 'GET',
+        method: 'POST',
         url: '/get_schedule',
         schema: {
+            body: {
+                type: 'object',
+                properties: {
+                    date: {
+                        type: 'string',
+                        pattern: '^\\d{2}\\.\\d{2}\\.\\d{4}$'
+                      },
+                    group: {type: 'string'}
+                },
+            },
             tags: ['schedule']
         },
         async handler(request, reply) {
@@ -16,5 +26,31 @@ module.exports = function (fastify, opts, next) {
             return data
         }
     })
+
+
+    fastify.route({
+        method: 'POST',
+        url: '/send_schedule',
+        schema: {
+            body: {
+                type: 'object',
+                properties: {
+                    files: {
+                        type: 'array',
+                        items: fastify.getSchema('MultipartFileType')
+                    }
+                },
+                required: ['files']
+            },
+            tags: ['schedule'],
+            
+        },
+        async handler(request, reply) {
+            const data = await job.sendSchedule(request.body, request.info, reply)
+            return data
+        }
+    })
+
+
     next()
 }

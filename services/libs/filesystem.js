@@ -6,6 +6,7 @@ const mimeTypes = require('mime-types');
 
 const mainDirectory = './public'
 const userFiles = mainDirectory + '/userFiles'
+const scheduleFiles = mainDirectory + '/schedule'
 const limit = 10485760; // 10 MB
 try {
     if (!fs.existsSync(mainDirectory)) {
@@ -27,6 +28,7 @@ function uploadFile(folder, file, options = {}) {
     }
     const regspace = / /g;
     try {
+        console.log(file.data)
         if (file.data.length > 0) {
             const {customStr, customLimit, customMIME} = options;
             const uploadLimit = customLimit || limit;
@@ -76,4 +78,5 @@ module.exports = {
     uploadFile: uploadFile,
     userFiles: userFiles,
     deleteFiles: deleteFiles,
+    scheduleFiles: scheduleFiles
 }
