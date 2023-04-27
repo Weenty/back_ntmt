@@ -221,9 +221,8 @@ async function deleteFolderRecursive(folder, userId, client) {
   // Удаляем файлы внутри папки
   for (const file of folder.files) {
     await client.query(`DELETE FROM files WHERE id = $1 AND "userId" = $2`, [file.id, userId]);
-    fs.unlinkSync(file.path);
+    fs.unlinkSync(file.filePath);
   }
-
   // Удаляем вложенные папки
   for (const subfolder of folder.folders) {
     await deleteFolderRecursive(subfolder, userId, client);
@@ -255,8 +254,6 @@ async function deleteFolder(object, user) {
     return data
   }
   struct = await createStruct(client, folderId);
-  
-  
   try {
     // Рекурсивно удаляем все папки и файлы из базы данных и файловой системы
     await deleteFolderRecursive(struct, userId, client);
@@ -346,11 +343,11 @@ async function getFolderStruct(object, user) {
     return data
   }
 
-  if(user.roleId==4) {
+  if(user.roleId==4 && folderId !== 1) {
     const checkFolder = await client.query(
       `SELECT "id"
       FROM folders
-      WHERE "id" = $1 AND userId = $2`,
+      WHERE "id" = $1 AND "userId" = $2`,
       [folderId, user.userId]
     );
     if (checkFolder.rows.length == 0) {
@@ -399,7 +396,6 @@ async function createStruct(client, folderId) {
     const childFolderStructures = await Promise.all(
       childFolders.rows.map((childFolder) => createStruct(client, childFolder.id))
     );
-      console.log(files.rows)
     const folderStructure = {
       id: folder.rows[0].id,
       name: folder.rows[0].name,
