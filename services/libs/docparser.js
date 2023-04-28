@@ -103,9 +103,9 @@ function searchDate(result, data) {
         result, data = parseSchedule(result, data, 5)
         fs.writeFile(`./public/schedule/${result['date']}.json`, JSON.stringify(result), function (err) {
           if (err) throw err;
-            return 'Успешное сохранение'
         });
       });
+      return true
   }
   
 

@@ -28,7 +28,6 @@ function uploadFile(folder, file, options = {}) {
     }
     const regspace = / /g;
     try {
-        console.log(file.data)
         if (file.data.length > 0) {
             const {customStr, customLimit, customMIME} = options;
             const uploadLimit = customLimit || limit;
