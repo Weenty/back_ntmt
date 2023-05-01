@@ -18,7 +18,8 @@ async function getSchedule(date, group) {
   catch (e) {
     data = []
   }
-  if (group && data.length) {
+  if (group) {
+    if (data.length == 0) return data
     data = data['groups'];
     for (let i = 0; i < data.length; i++) {
       if (data[i].code.split(' ').join('') == group.split(' ').join('')) {
