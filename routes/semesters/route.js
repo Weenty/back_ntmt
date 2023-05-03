@@ -34,7 +34,7 @@ module.exports = function (fastify, opts, next) {
                 },
                 required: ['value']
             },
-            tags: ['semesaters'],
+            tags: ['semesters'],
             response: {
                 400: {
                     type: 'object',
@@ -69,7 +69,7 @@ module.exports = function (fastify, opts, next) {
                 },
                 required: ['semesterId']
             },
-            tags: ['semesaters'],
+            tags: ['semesters'],
             response: {
                 400: {
                     type: 'object',
@@ -104,7 +104,7 @@ module.exports = function (fastify, opts, next) {
                 },
                 required: ['semesterId', 'value']
             },
-            tags: ['semesaters'],
+            tags: ['semesters'],
             response: {
                 400: {
                     type: 'object',
