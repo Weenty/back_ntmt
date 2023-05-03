@@ -337,7 +337,7 @@ async function login2(object, reply) {
               expiresIn: "24h",
             }
           );
-          reply.send({
+          data = {
             message: {
               token: token,
               userId: +userId,
@@ -346,7 +346,7 @@ async function login2(object, reply) {
               groupName: groupName,
             },
             statusCode: 200,
-          });
+          }
           console.log(`Успешный вход для пользователя ${login}`);
         } else {
           data = {
@@ -360,7 +360,6 @@ async function login2(object, reply) {
           message: `Пользователя с логином ${login} не существует`,
           statusCode: 400,
         };
-        console.log(`Ошибка при нахождении пользователя с логином ${login}`);
       }
     } else {
       data = {
@@ -370,13 +369,12 @@ async function login2(object, reply) {
       console.log(`Вход типа ${type} недоступен`);
     }
   } catch (e) {
-    return data;
-    console.log(e);
+    console.log(e.message)
   } finally {
     client.release();
     console.log("client.release");
   }
-  //   return data;
+    return data;
 }
 
 module.exports = {
