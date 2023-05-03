@@ -10,14 +10,14 @@ exports.up = async pgm => {
         throw 'Ошибка при создании группы'
     }
     const group2 = await pgm.db.query(`insert into groups ("groupName", "code", "typeOfStudyingId")
-                                      values ('IT', 'IT', 1)
+                                      values ('Технологии оптимизации', 'ТО-12901', 1)
                                       returning "id"`)
     if (group2.rowCount === 0 || group2.rows.length === 0) {
         throw 'Ошибка при создании группы'
     }
 
     const group3 = await pgm.db.query(`insert into groups ("groupName", "code", "typeOfStudyingId")
-                                      values ('ПИ', 'ПИ', 1)
+                                      values ('Технологии дерьма', 'ТО-21906', 1)
                                       returning "id"`)
     if (group3.rowCount === 0 || group3.rows.length === 0) {
         throw 'Ошибка при создании группы'
