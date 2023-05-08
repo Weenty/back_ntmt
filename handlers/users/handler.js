@@ -16,7 +16,7 @@ async function getUser(object, user, id) {
   try {
     let resQueryGetUser
     if (id) {
-      const queryGetUser = `SELECT u."id", ur."roleId", u."login", concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio" 
+      const queryGetUser = `SELECT u."id", ur."roleId", concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio" 
       FROM users u
       left join bios b on u."id" = b."id"
       left join userroles ur on u."id" = ur."userId"
@@ -25,7 +25,7 @@ async function getUser(object, user, id) {
     }
     else {
 
-      const queryGetUser = `SELECT u."id", u."login", ur."roleId", concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio" 
+      const queryGetUser = `SELECT u."id", ur."roleId", concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio" 
       FROM users u
       left join userroles ur on u."id" = ur."userId"
       left join bios b on u."id" = b."id"`;
@@ -50,6 +50,46 @@ async function getUser(object, user, id) {
   return data;
 }
 
+async function getByRole(object, user) {
+  let data = {
+    message: "",
+    statusCode: 400,
+  };
+  const roleId = object.roleId
+  const client = await pool.connect();
+  if (user.roleId != 1) {
+    data = {
+      message: "access denied",
+      statusCode: 400,
+    };
+    return data;
+  }
+  try {
+    const queryGetByRole= `SELECT u."id", concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio" 
+      FROM users u
+      left join userroles ur on u."id" = ur."userId"
+      left join bios b on u."id" = b."id"
+      WHERE ur."roleId" = $1`;
+    const resQueryGetUser = await client.query(queryGetByRole, [roleId]);
+    data = {
+      message: resQueryGetUser.rows,
+      statusCode: 200,
+    };
+    return data;
+  } catch (e) {
+    console.log(e);
+    data = {
+      message: e,
+      statusCode: 400,
+    };
+  } finally {
+    client.release();
+    console.log("client.release");
+  }
+  return data;
+}
+
 module.exports = {
   getUser: getUser,
+  getByRole: getByRole
 };
