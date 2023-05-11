@@ -33,6 +33,13 @@ exports.up = async pgm => {
         throw 'Ошибка при добавлении типа экзамена'
     }
 
+    const examType2 = await pgm.db.query(`insert into examtypes ("id", "type")
+                                      values ('2', 'Зачет')
+                                      returning "id"`)
+    if (examType2.rowCount === 0 || examType2.rows.length === 0) {
+        throw 'Ошибка при добавлении типа экзамена'
+    }
+
     const semestr = await pgm.db.query(`insert into semesters ("id", "value")
                                       values ('1', 'Осенний')
                                       returning "id"`)
