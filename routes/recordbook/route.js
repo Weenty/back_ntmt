@@ -81,7 +81,7 @@ module.exports = function (fastify, opts, next) {
                     endMark: {type: 'string'},
                     date: {
                         type: 'string',
-                        format: 'date-time'
+                        pattern: '^\\d{2}\\.\\d{2}\\.\\d{4}$'
                       },
                     userId: {type: 'integer'},
                     subjectId: {type: 'integer'}, 
@@ -164,7 +164,7 @@ module.exports = function (fastify, opts, next) {
                     endMark: {type: 'string'},
                     date: {
                         type: 'string',
-                        format: 'date-time'
+                        pattern: '^\\d{2}\\.\\d{2}\\.\\d{4}$'
                       },
                     userId: {type: 'integer'},
                     subjectId: {type: 'integer'}, 

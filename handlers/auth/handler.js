@@ -202,14 +202,15 @@ async function login2(object, reply) {
 
     if (type === constants.LOGIN_TYPES.activeDirectory) {
       const ldapClient = ldap.createClient({
-        url: "ldap://172.16.0.10:389",
+        url: "LDAP://nuk-5142-017.edu.ntiustu.local",
       });
       // Если пользователь авторизуется через active directory
       let check = false;
       ldapClient.on('error', (err) => {
         console.error(err)
       });
-      ldapClient.bind("ADATUM\\" + login, password, (err, res) => {
+      
+      ldapClient.bind("ntmt\\" + login, password, (err, res) => {
         if (err) {
           data = {
             message: "Неправильный логин или пароль",
@@ -227,7 +228,7 @@ async function login2(object, reply) {
             filter: `(sAMAccountName=${login})`,
             scope: "sub",
           };
-          ldapClient.search("dc=ADATUM,dc=com", opts, function (err, res) {
+          ldapClient.search("dc=ntmt,dc=local", opts, function (err, res) {
             if (err) {
               console.log("Error in search " + err);
             } else {

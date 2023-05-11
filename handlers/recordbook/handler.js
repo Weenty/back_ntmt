@@ -18,7 +18,7 @@ async function selectRecordBook(object, user) {
     const checkRecord = await client.query(
       `SELECT r."endMark",
         r."id",
-        r."date",
+        to_char(r."date" AT TIME ZONE 'UTC', 'dd.mm.yyyy'),
         s."name",
         s."summaryHours",
         et."type",
@@ -113,7 +113,8 @@ async function createRecordBook(object, user) {
     statusCode: 400,
   };
   const endMark = object.endMark;
-  const date = object.date;
+  const date = new Date(object.date.split('.').reverse().join('.'));
+  const isoString = date.toLocaleString("sv", {timeZoneName: "short"});
   const userId = object.userId;
   const subjectId = object.subjectId;
   const semestrId = object.semestrId;
@@ -167,7 +168,7 @@ async function createRecordBook(object, user) {
     const recordBook = await client.query(
       `insert into recordbooks ("id", "endMark", "date", "userId", "subjectId", "semestrId", "year")
                                       values ((SELECT MAX(id) + 1 FROM recordbooks), $1, $2, $3, $4, $5, $6)`,
-      [endMark, date, userId, subjectId, semestrId, year]
+      [endMark, isoString, userId, subjectId, semestrId, year]
     );
 
     data = {
@@ -251,7 +252,8 @@ async function updateRecordBook(object, user) {
     statusCode: 400,
   };
   const endMark = object.endMark;
-  const date = object.date;
+  const date = new Date(object.date.split('.').reverse().join('.'));
+  const isoString = date.toLocaleString("sv", {timeZoneName: "short"});
   const userId = object.userId;
   const subjectId = object.subjectId;
   const semestrId = object.semestrId;
@@ -290,7 +292,7 @@ async function updateRecordBook(object, user) {
 
     if (date) {
       updates.push(`"date" = $${updates.length + 1}`);
-      values.push(date);
+      values.push(isoString);
     }
 
     if (userId) {
