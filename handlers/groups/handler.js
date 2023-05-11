@@ -7,7 +7,10 @@ async function getGroups(object, user) {
   };
   const client = await pool.connect();
   try {
-    const resQueryGetGroups = await client.query(`SELECT * FROM groups`, [])
+    const resQueryGetGroups = await client.query(`SELECT g."id", g."groupName", g."code", t."type" 
+                                                FROM groups g
+                                                left join typesofstudying t on g."typeOfStudyingId" = t."id"
+                                                  `, [])
     data = {
       message: resQueryGetGroups.rows,
       statusCode: 200,

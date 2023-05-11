@@ -27,7 +27,7 @@ async function selectRecordBook(object, user) {
         b."patronomyc",
         s."name",
         g."groupName",
-        g."typeOfStudyingId",
+        t."type",
         concat_ws(' ', teacher."secondName", teacher."name", teacher."patronomyc") as "teacher"
  FROM recordbooks r
           INNER JOIN subjects s on r."subjectId" = s."id"
@@ -35,6 +35,7 @@ async function selectRecordBook(object, user) {
           INNER JOIN users u on r."userId" = u.id
           INNER JOIN bios b on u."id" = b."userId"
           inner join groups g on u."groupId" = g.id
+          inner join typesofstudying t on g."typeOfStudyingId" = t."id"
           inner join bios teacher on s."userId" = teacher."userId"
  WHERE r."userId" = $1`,
       [object.userId]
