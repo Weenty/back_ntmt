@@ -18,7 +18,7 @@ async function selectRecordBook(object, user) {
     const checkRecord = await client.query(
       `SELECT r."endMark",
         r."id",
-        to_char(r."date" AT TIME ZONE 'UTC', 'dd.mm.yyyy') as date,
+        to_char(r."date" AT TIME ZONE 'UTC', 'dd.mm.yyyy') as "date",
         s."name",
         s."summaryHours",
         et."type",
