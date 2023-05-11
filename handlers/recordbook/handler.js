@@ -290,7 +290,7 @@ async function updateRecordBook(object, user) {
       values.push(endMark);
     }
 
-    if (date) {
+    if (object.date) {
       updates.push(`"date" = $${updates.length + 1}`);
       values.push(isoString);
     }
