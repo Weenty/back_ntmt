@@ -1,12 +1,6 @@
 const { pool } = require("../../dependencies");
 
 async function getExamTypes(user) {
-  if (user.roleId != 1) {
-    return {
-        message: 'access denied', 
-        statusCode: 403,
-    }
-  }
     let data = {
     message: "",
     statusCode: 400,
