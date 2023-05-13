@@ -13,6 +13,6 @@ COPY . .
 EXPOSE 3001
 
 CMD service postgresql start \
-&& su - postgres -c 'dropdb --if-exists ntmt && createdb ntmt' \
+&& su - postgres -c 'createdb ntmt' \
 && npm run migrate \
 && npm start

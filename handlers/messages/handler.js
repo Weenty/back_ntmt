@@ -111,7 +111,7 @@ async function createMessage(object, user) {
         const resSelectMessage = await client.query(querySelectMessage, [
           object.title,
           object.text,
-          userId,
+          userId[i],
         ]);
 
         const resSelectMessage2 = await client.query(messagesuser, [
