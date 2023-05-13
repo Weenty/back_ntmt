@@ -19,6 +19,10 @@ exports.up = pgm => {
         },
         author:{
             type:'bigint'
+        },
+        view: {
+            type: 'integer',
+            default: 1
         }
     }, {
         ifNotExists: true,
