@@ -104,18 +104,18 @@ async function createMessage(object, user) {
       workWithUser = object.userid[i];
       const queryCheckUser = "SELECT * FROM users WHERE id = $1";
       const resqueryCheckUser = await client.query(queryCheckUser, [
-        object.userid[i],
+        workWithUser,
       ]);
 
       if (resqueryCheckUser.rows.length > 0) {
         const resSelectMessage = await client.query(querySelectMessage, [
           object.title,
           object.text,
-          userId[i],
+          workWithUser,
         ]);
 
         const resSelectMessage2 = await client.query(messagesuser, [
-          object.userid[0],
+          workWithUser,
           resSelectMessage.rows[0].id,
         ]);
 
