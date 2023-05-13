@@ -84,5 +84,31 @@ module.exports = function (fastify, opts, next) {
         }
     })
     
+
+    fastify.route({
+        method: 'POST',
+        url: '/disable_views',
+        schema: {
+            body: {
+                type: 'object',
+                properties: {
+                    listMessages: {type: 'array'},
+                },
+                required: ['listMessages']
+            },
+            tags: ['messages']
+        },
+        async handler(request, reply) {
+            const data = await job.disableView(request.body, request.info)
+            if (data.statusCode == 200) {
+                reply.status(200)
+                return data
+            } else {
+                reply.status(400)
+                return data
+            }
+        }
+    })
+
     next()
 }

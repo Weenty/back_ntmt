@@ -18,7 +18,7 @@ async function getMessages(object, user, list) {
     const querySelectAllMessages = `SELECT *
                                         FROM usermessages um
                                                  LEFT JOIN messages m on um."messageId" = m.id
-                                        WHERE "userId" = $1
+                                        WHERE "userId" = $1 AND "view" = 1
                                         ORDER BY m.date DESC
                                         OFFSET $2 LIMIT $3`;
     const resSelectAllMessages = await client.query(querySelectAllMessages, [
@@ -40,6 +40,38 @@ async function getMessages(object, user, list) {
   } finally {
     client.release();
     console.log("client.release");
+  }
+  return data;
+}
+
+async function disableView(object, user) {
+  let data = {
+    message: "",
+    statusCode: 400,
+  };
+  const list = object.listMessages
+  const client = await pool.connect();
+  try {
+    let lossMessage = []
+    for (let i = 0; i<list.length; i++) {
+      const checkMessage = await client.query(`SELECT * FROM usermessages WHERE "userId" = $1 AND "messageId" = $2`, [user.userId, list[i]])
+      if (checkMessage.rows.length > 0) {
+        const setNewView = await client.query(`UPDATE usermessages SET "view" = 0 WHERE "userId" = $1 AND "messageId" = $2`, [user.userId, list[i]])
+      }
+      else {
+        lossMessage.push(list[i])
+      }
+    }
+    data = {
+      message: lossMessage.length > 0 ? `Сообщения: ${lossMessage.join(', ')} не были изменены` : 'Сообщения скрыты',
+      statusCode: lossMessage.length > 0 ? 206 : 200,
+    }
+    return data
+  } catch (e) {
+    console.log(e);
+  } finally {
+    client.release();
+    console.log("client.release()");
   }
   return data;
 }
@@ -149,4 +181,5 @@ module.exports = {
   getMessages: getMessages,
   getInfoAboutMessage: getInfoAboutMessage,
   createMessage: createMessage,
+  disableView: disableView
 };

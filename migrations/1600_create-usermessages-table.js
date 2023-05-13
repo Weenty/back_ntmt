@@ -12,6 +12,10 @@ exports.up = pgm => {
         },
         messageId: {
             type: 'bigint'
+        },
+        view: {
+            type: 'integer',
+            default: 1
         }
     }, {
         ifNotExists: true,
