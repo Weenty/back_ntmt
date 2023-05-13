@@ -131,7 +131,11 @@ async function createMessage(object, user) {
       values ((SELECT MAX(id) + 1 FROM messages), $1, $2, 'NOW()', $3) returning "id"`;
 
     const messagesuser = `insert into usermessages ("id", "userId", "messageId") values ((SELECT MAX(id) + 1 FROM usermessages), $1, $2)`;
-
+    const resSelectMessage = await client.query(querySelectMessage, [
+      object.title,
+      object.text,
+      user.userId,
+    ]);
     for (let i = 0; i < object.userid.length; i++) {
       workWithUser = object.userid[i];
       const queryCheckUser = "SELECT * FROM users WHERE id = $1";
@@ -140,12 +144,6 @@ async function createMessage(object, user) {
       ]);
 
       if (resqueryCheckUser.rows.length > 0) {
-        const resSelectMessage = await client.query(querySelectMessage, [
-          object.title,
-          object.text,
-          workWithUser,
-        ]);
-
         const resSelectMessage2 = await client.query(messagesuser, [
           workWithUser,
           resSelectMessage.rows[0].id,
