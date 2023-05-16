@@ -21,7 +21,7 @@ async function selectRecordBook(object, user) {
         to_char(r."date" AT TIME ZONE 'UTC', 'dd.mm.yyyy') as "date",
         s."name",
         s."summaryHours",
-        et."type",
+        et."type" as "examtype",
         b."name",
         b."secondName",
         b."patronomyc",
@@ -203,11 +203,12 @@ async function getRecordBook(object, user) {
                                               r."date",
                                               s."name",
                                               s."summaryHours",
-                                              et."type",
+                                              et."type" as "examtype",
                                               b."name",
                                               b."secondName",
                                               b."patronomyc",
                                               g."groupName",
+                                              t."type",
                                               g."typeOfStudyingId",
                                               concat_ws(' ', teacher."secondName", teacher."name", teacher."patronomyc") as "teacher"
                                        FROM recordbooks r
@@ -216,6 +217,7 @@ async function getRecordBook(object, user) {
                                                 INNER JOIN users u on r."userId" = u.id
                                                 INNER JOIN bios b on u."id" = b."userId"
                                                 inner join groups g on u."groupId" = g.id
+                                                inner join typesofstudying t on g."typeOfStudyingId" = t."id"
                                                 inner join bios teacher on s."userId" = teacher."userId"
                                        WHERE r."userId" = $1
                                          AND r."semestrId" = $2
