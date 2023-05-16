@@ -397,6 +397,7 @@ async function createStruct(client, folderId) {
     const folderStructure = {
       id: folder.rows[0].id,
       name: folder.rows[0].name,
+      userId: folder.rows[0].userId,
       files: files.rows.map((file) => ({
         id: file.id,
         userid: file.userId,
@@ -465,13 +466,13 @@ async function getFoldersStudents(object, user) {
   }
   const client = await pool.connect();
   try {
-    let getFolders = `SELECT ur."userId", f."id" 
+    let getFolders = `SELECT ur."userId", f."id"
     FROM folders f
     left join userroles ur on ur."userId" = f."userId"
     WHERE f."folderId" is null AND ur."roleId" = 4`
     if (group) {
       arr.push(group)
-      getFolders = `SELECT ur."userId", f."id", f."userId" 
+      getFolders = `SELECT ur."userId", f."id"
     FROM folders f
     left join userroles ur on ur."userId" = f."userId"
     left join users u on u."id" = ur."userId"
