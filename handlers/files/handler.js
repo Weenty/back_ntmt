@@ -1,8 +1,6 @@
 const { filesystem, pool, constants } = require("../../dependencies");
 const fs = require("fs");
-const { group } = require("console");
-const { get } = require("http");
-const { Integer } = require("read-excel-file");
+
 async function uploadFiles(object, user) {
   let data = {
     message: "",
@@ -473,7 +471,7 @@ async function getFoldersStudents(object, user) {
     WHERE f."folderId" is null AND ur."roleId" = 4`
     if (group) {
       arr.push(group)
-      getFolders = `SELECT ur."userId", f."id" 
+      getFolders = `SELECT ur."userId", f."id", f."userId" 
     FROM folders f
     left join userroles ur on ur."userId" = f."userId"
     left join users u on u."id" = ur."userId"
