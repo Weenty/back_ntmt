@@ -195,6 +195,7 @@ async function login2(object, reply) {
   
   const client = await pool.connect();
 
+  
   try {
     const type = object.type; // Получаем тип пользователя
     const login = object.login;
