@@ -187,6 +187,7 @@ async function registration(object) {
   return data;
 }
 
+
 async function login2(object, reply) {
   let data = {
     message: "",
