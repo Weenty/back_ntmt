@@ -145,7 +145,7 @@ async function registration(object) {
           if (resInsertUserRole.rows.length > 0) {
             await client.query("COMMIT");
             data = {
-              message: "success",
+              message: Number(resInsertUsers.rows[0].id),
               statusCode: 200,
             };
           } else {
@@ -195,7 +195,7 @@ async function login2(object, reply) {
   
   const client = await pool.connect();
 
-  
+
   try {
     const type = object.type; // Получаем тип пользователя
     const login = object.login;
@@ -211,7 +211,7 @@ async function login2(object, reply) {
         console.error(err)
       });
       
-      ldapClient.bind("ntmt\\" + login, password, (err, res) => {
+      ldapClient.bind("EDU\\" + login, password, (err, res) => {
         if (err) {
           data = {
             message: "Неправильный логин или пароль",
@@ -229,7 +229,7 @@ async function login2(object, reply) {
             filter: `(sAMAccountName=${login})`,
             scope: "sub",
           };
-          ldapClient.search("dc=ntmt,dc=local", opts, function (err, res) {
+          ldapClient.search(`dc=edu,dc=ntiustu,dc=local`, opts, function (err, res) {
             if (err) {
               console.log("Error in search " + err);
             } else {
@@ -250,17 +250,23 @@ async function login2(object, reply) {
       });
 
       emmiter.on("searchEntry", async (args, reply) => {
-        console.log(args);
-        const groupCode = args.department;
-        const name = args.givenName;
-        const secondName = args.sn;
+        let GroupArr = args.description.split('-')
+        if(GroupArr[0][0] === '_') {
+          GroupArr[0] = GroupArr[0].slice(1);
+        }
+        const groupCode =`${GroupArr[0]}-${GroupArr[1]}`
+        let displayName = args.displayName.split(' ');
+        //todo: Сделать определение роли
+        const roleId = 4
+        const name = displayName[1];
+        const secondName = displayName[0];
+        const patronomyc = displayName[2]
         const querySelectGroup = `SELECT *
                                           FROM groups
                                           WHERE "code" = $1`;
         const resSelectGroup = await client.query(querySelectGroup, [
           groupCode,
         ]);
-
         if (resSelectGroup.rows.length > 0) {
           const querySelectBio = `SELECT *
                                             FROM bios
@@ -270,22 +276,27 @@ async function login2(object, reply) {
             name,
             secondName,
           ]);
+          let registerObject = {
+            name: name,
+            login: login,
+            secondName: secondName,
+            patronomyc: patronomyc,
+            password: password,
+            grant: 2000,
+            role: roleId,
+            type: constants.LOGIN_TYPES.activeDirectory,
+            groupId: resSelectGroup.rows[0].id,
+          };
           if (resSelectBio.rows.length == 0) {
-            let registerObject = {
-              name: name,
-              login: args.sAMAccountName,
-              secondName: secondName,
-              password: password,
-              type: constants.LOGIN_TYPES.activeDirectory,
-              groupId: resSelectGroup.rows[0].id,
-            };
             let registerData = await registration(registerObject);
             console.log(registerData);
             await login2(object, reply);
           } else {
-            const token = await jwt.sign(
+            // let registerData = await registration(registerObject);
+            // console.log(registerData);
+            const token = jwt.sign(
               {
-                sAMAccountName: args.sAMAccountName,
+                sAMAccountName: login,
                 userId: resSelectBio.rows[0].userId,
               },
               process.env.PRIVATE_KEY,
@@ -304,9 +315,10 @@ async function login2(object, reply) {
             message: "Группы с таким номером не существует",
             statusCode: 400,
           };
+          return data
         }
+        
       });
-
       //   return userData;
     } else if (type === constants.LOGIN_TYPES.loginPassword) {
       //Если пользователь авторизуется через нашу базу
@@ -350,11 +362,13 @@ async function login2(object, reply) {
             statusCode: 200,
           }
           console.log(`Успешный вход для пользователя ${login}`);
+          return data
         } else {
           data = {
             message: `Неверный пароль для пользователя: ${login}`,
             statusCode: 400,
           };
+          return data
           console.log("Неверный пароль");
         }
       } else {
@@ -362,21 +376,23 @@ async function login2(object, reply) {
           message: `Пользователя с логином ${login} не существует`,
           statusCode: 400,
         };
+        return data
       }
     } else {
       data = {
         message: `Вход типа ${type} недоступен`,
         statusCode: 400,
       };
+      return data
       console.log(`Вход типа ${type} недоступен`);
     }
   } catch (e) {
     console.log(e.message)
+    return data
   } finally {
     client.release();
     console.log("client.release");
   }
-    return data;
 }
 
 module.exports = {

@@ -60,7 +60,7 @@ exports.up = async pgm => {
         throw 'Ошибка при создании био'
     }
     const bio2 = await pgm.db.query(`insert into bios ("name", "secondName", "patronomyc", "grant", "userId", "flura")
-                                    values ('Антон', 'Паньшин', 'Александрович', 22000, ${prep.rows[0].id}, now())`)
+                                    values ('Алексей', 'Паньшин', 'Александрович', 22000, ${prep.rows[0].id}, now())`)
     if (bio2.rowCount === 0) {
         throw 'Ошибка при создании био'
     }
