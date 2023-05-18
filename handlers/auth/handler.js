@@ -211,12 +211,7 @@ async function login2(object, reply) {
 
       const args = await tryConnect(login, password, ldapClient1, ldapClient2,
         {
-          // baseDN: "dc=edu,dc=ntiustu,dc=local", opts: {
-          //   filter: `(department=НТМТ)`,
-          //   scope: "sub",
-          //   attributes: ["description"]
-          // }
-          baseDN: "dc=ntiustu,dc=local", opts: {
+          baseDN: "dc=edu,dc=ntiustu,dc=local", opts: {
             filter: `(sAMAccountName=${login})`,
             scope: "sub",
           }
@@ -228,11 +223,10 @@ async function login2(object, reply) {
           }
         }, client
       );
-      // console.log(args)
-      // return data
+
       let GroupArr = args.description.split('-')
       if (GroupArr[0][0] === '_') {
-        return({
+        return ({
           message: "non-active user",
           statusCode: 403,
         })
@@ -240,20 +234,20 @@ async function login2(object, reply) {
       let groupCode = `${GroupArr[0]}-${GroupArr[1]}`
       let displayName = args.displayName.split(' ');
       let roleId = 0
-      if(RegExp('CN=AllowCreateStudents').test(args.memberOf)){
+      if (RegExp('CN=AllowCreateStudents').test(args.memberOf)) {
         roleId = 4
       }
-      if(RegExp('CN=Prepods').test(args.memberOf)){
+      if (RegExp('CN=Prepods').test(args.memberOf)) {
         roleId = 3
         groupCode = null
       }
-      if(RegExp('CN=NTMT_PortalAdmin').test(args.memberOf)){
+      if (RegExp('CN=NTMT_PortalAdmin').test(args.memberOf)) {
         roleId = 1
         groupCode = null
       }
-      if(roleId == 0) {
+      if (roleId == 0) {
         return data
-      } 
+      }
       const name = displayName[1];
       const secondName = displayName[0];
       const patronomyc = displayName[2]
@@ -288,6 +282,8 @@ async function login2(object, reply) {
           console.log(registerData);
           return (await login2(object))
         } else {
+          // const checkGroupForUser = await client.query(`SELECT "groupId" FROM users WHERE "id"=$1 AND "groupId"=$2`,[resSelectBio.rows[0].userId, resSelectGroup?.rows[0]?.id])
+          //todo: Сделать сравнение группы в бд и из директори
           const token = jwt.sign(
             {
               sAMAccountName: login,
@@ -299,17 +295,24 @@ async function login2(object, reply) {
             }
           );
           userData = {
-            message: token,
+            message: {token:token},
             statusCode: 200,
           };
           return (userData);
         }
       } else {
-        data = {
-          message: "Группы с таким номером не существует",
-          statusCode: 400,
-        };
-        return (data)
+        let GroupsArr = await parseGroups(ldapClient1, "EDU\\" + login, password, {
+          baseDN: "dc=edu,dc=ntiustu,dc=local", opts: {
+            filter: `(department=НТМТ)`,
+            scope: "sub",
+            attributes: ["description"]
+          }
+        })
+        for (let i = 0; i < GroupsArr.length; i++) {
+          await client.query(`insert into groups ("groupName", "code", "typeOfStudyingId")
+                                        values ($1, $2, $3)`, [GroupsArr[i], GroupsArr[i], GroupsArr[i].length > 2 ? 2:1])
+        }
+        await login2(object)
       }
 
     } else if (type === constants.LOGIN_TYPES.loginPassword) {
@@ -414,6 +417,45 @@ async function tryConnect(login, password, ldapClient1, ldapClient2, searchParam
     message: "Неправильный логин или пароль",
     statusCode: 400,
   }
+}
+
+function parseGroups(ldapClient, login, password, searchParams) {
+  return new Promise((resolve, reject) => {
+    ldapClient.bind(login, password, (err) => {
+      if (err) {
+        // Привязка не удалась
+        reject(err);
+      } else {
+        // Привязка успешна
+        // Выполнение поиска по LDAP с заданными параметрами
+        ldapClient.search(searchParams.baseDN, searchParams.opts, (err, res) => {
+          if (err) {
+            // Поиск не удался
+            reject(err);
+          } else {
+            // Поиск успешен
+            // Обработка результатов поиска
+            let EntyArr = []
+            res.on('searchEntry', (entry) => {
+              let GroupArr = entry.object.description.split('-')
+              let groupCode = `${GroupArr[0]}-${GroupArr[1]}`
+              if (!EntyArr.includes(groupCode)) {
+                EntyArr.push(groupCode)
+              }
+            });
+            res.on('error', (err) => {
+              console.error('Ошибка поиска:', err.message);
+              ldapClient.unbind();
+            });
+            res.on('end', (result) => {
+              resolve(EntyArr);
+              ldapClient.unbind();
+            });
+          }
+        });
+      }
+    });
+  });
 }
 
 function tryBind(ldapClient, login, password, searchParams, client) {
