@@ -25,7 +25,7 @@ async function selectRecordBook(object, user) {
         b."name",
         b."secondName",
         b."patronomyc",
-        s."name",
+        s."name" as "subjectName",
         g."groupName",
         t."type",
         concat_ws(' ', teacher."secondName", teacher."name", teacher."patronomyc") as "teacher"
@@ -201,7 +201,7 @@ async function getRecordBook(object, user) {
                                               r."id",
                                               s."name",
                                               r."date",
-                                              s."name",
+                                              s."name" as "subjectName",
                                               s."summaryHours",
                                               et."type" as "examtype",
                                               b."name",
