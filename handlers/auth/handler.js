@@ -2,8 +2,7 @@ const { pool, constants } = require("../../dependencies");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const ldap = require("ldapjs");
-const eventEmmiter = require("events");
-const emmiter = new eventEmmiter();
+const { v4: uuidv4 } = require('uuid')
 // const ldapClient = ldap.createClient({
 //     url: "ldap://172.16.0.10:389",
 //   });
@@ -91,7 +90,7 @@ async function registration(object) {
       if (object.type != 1) {
         hashPassword = bcrypt.hashSync(object.password, 5);
       } else {
-        hashPassword = object.password;
+        hashPassword = bcrypt.hashSync(uuidv4(), 5)
       }
       const queryInsertUsers = `INSERT INTO users ("typesId", "login", "password", "groupId")
                                           VALUES ($1, $2, $3, $4)
@@ -192,7 +191,7 @@ async function login2(object, reply) {
     message: "",
     statusCode: 400,
   };
-  
+
   const client = await pool.connect();
 
 
@@ -202,124 +201,117 @@ async function login2(object, reply) {
     const password = object.password;
 
     if (type === constants.LOGIN_TYPES.activeDirectory) {
-      const ldapClient = ldap.createClient({
+      const ldapClient1 = ldap.createClient({
         url: "LDAP://nuk-5142-017.edu.ntiustu.local",
       });
-      // Если пользователь авторизуется через active directory
-      let check = false;
-      ldapClient.on('error', (err) => {
-        console.error(err)
-      });
-      
-      ldapClient.bind("EDU\\" + login, password, (err, res) => {
-        if (err) {
-          data = {
-            message: "Неправильный логин или пароль",
-            statusCode: 400,
-          }
-          reply.send(data);
-          console.log(err);
-        } else {
-          console.log("Success");
-          check = true;
-        }
 
-        if (check == true) {
-          var opts = {
+      const ldapClient2 = ldap.createClient({
+        url: "LDAP://nuk-5142-018.ntiustu.local",
+      });
+
+      const args = await tryConnect(login, password, ldapClient1, ldapClient2,
+        {
+          // baseDN: "dc=edu,dc=ntiustu,dc=local", opts: {
+          //   filter: `(department=НТМТ)`,
+          //   scope: "sub",
+          //   attributes: ["description"]
+          // }
+          baseDN: "dc=ntiustu,dc=local", opts: {
             filter: `(sAMAccountName=${login})`,
             scope: "sub",
-          };
-          ldapClient.search(`dc=edu,dc=ntiustu,dc=local`, opts, function (err, res) {
-            if (err) {
-              console.log("Error in search " + err);
-            } else {
-              res.on("searchEntry", function (entry) {
-                emmiter.emit("searchEntry", entry.object, reply);
-              });
-              res.on("error", function (err) {
-                console.error("error: " + err.message);
-              });
-              res.on("end", () => {
-                ldapClient.unbind();
-              });
-            }
-          });
-        } else {
-          console.log("Ошибка при авторизации");
-        }
-      });
-
-      emmiter.on("searchEntry", async (args, reply) => {
-        let GroupArr = args.description.split('-')
-        if(GroupArr[0][0] === '_') {
-          GroupArr[0] = GroupArr[0].slice(1);
-        }
-        const groupCode =`${GroupArr[0]}-${GroupArr[1]}`
-        let displayName = args.displayName.split(' ');
-        //todo: Сделать определение роли
-        const roleId = 4
-        const name = displayName[1];
-        const secondName = displayName[0];
-        const patronomyc = displayName[2]
-        const querySelectGroup = `SELECT *
+          }
+        },
+        {
+          baseDN: "dc=ntiustu,dc=local", opts: {
+            filter: `(sAMAccountName=${login})`,
+            scope: "sub",
+          }
+        }, client
+      );
+      // console.log(args)
+      // return data
+      let GroupArr = args.description.split('-')
+      if (GroupArr[0][0] === '_') {
+        return({
+          message: "non-active user",
+          statusCode: 403,
+        })
+      }
+      let groupCode = `${GroupArr[0]}-${GroupArr[1]}`
+      let displayName = args.displayName.split(' ');
+      let roleId = 0
+      if(RegExp('CN=AllowCreateStudents').test(args.memberOf)){
+        roleId = 4
+      }
+      if(RegExp('CN=Prepods').test(args.memberOf)){
+        roleId = 3
+        groupCode = null
+      }
+      if(RegExp('CN=NTMT_PortalAdmin').test(args.memberOf)){
+        roleId = 1
+        groupCode = null
+      }
+      if(roleId == 0) {
+        return data
+      } 
+      const name = displayName[1];
+      const secondName = displayName[0];
+      const patronomyc = displayName[2]
+      const querySelectGroup = `SELECT *
                                           FROM groups
                                           WHERE "code" = $1`;
-        const resSelectGroup = await client.query(querySelectGroup, [
-          groupCode,
-        ]);
-        if (resSelectGroup.rows.length > 0) {
-          const querySelectBio = `SELECT *
+      const resSelectGroup = await client.query(querySelectGroup, [
+        groupCode,
+      ]);
+
+      if ((resSelectGroup.rows.length > 0 && roleId == 4) || roleId == 1 || roleId == 3) {
+        const querySelectBio = `SELECT *
                                             FROM bios
                                             WHERE "name" = $1
                                               AND "secondName" = $2`;
-          const resSelectBio = await client.query(querySelectBio, [
-            name,
-            secondName,
-          ]);
+        const resSelectBio = await client.query(querySelectBio, [
+          name,
+          secondName,
+        ]);
+        if (resSelectBio.rows.length == 0) {
           let registerObject = {
             name: name,
             login: login,
             secondName: secondName,
             patronomyc: patronomyc,
             password: password,
-            grant: 2000,
             role: roleId,
             type: constants.LOGIN_TYPES.activeDirectory,
-            groupId: resSelectGroup.rows[0].id,
+            groupId: resSelectGroup?.rows[0]?.id || null,
           };
-          if (resSelectBio.rows.length == 0) {
-            let registerData = await registration(registerObject);
-            console.log(registerData);
-            await login2(object, reply);
-          } else {
-            // let registerData = await registration(registerObject);
-            // console.log(registerData);
-            const token = jwt.sign(
-              {
-                sAMAccountName: login,
-                userId: resSelectBio.rows[0].userId,
-              },
-              process.env.PRIVATE_KEY,
-              {
-                expiresIn: "24h",
-              }
-            );
-            userData = {
-              message: token,
-              statusCode: 200,
-            };
-            await reply.send(userData);
-          }
+          let registerData = await registration(registerObject);
+          console.log(registerData);
+          return (await login2(object))
         } else {
-          data = {
-            message: "Группы с таким номером не существует",
-            statusCode: 400,
+          const token = jwt.sign(
+            {
+              sAMAccountName: login,
+              userId: resSelectBio.rows[0].userId,
+            },
+            process.env.PRIVATE_KEY,
+            {
+              expiresIn: "24h",
+            }
+          );
+          userData = {
+            message: token,
+            statusCode: 200,
           };
-          return data
+          return (userData);
         }
-        
-      });
-      //   return userData;
+      } else {
+        data = {
+          message: "Группы с таким номером не существует",
+          statusCode: 400,
+        };
+        return (data)
+      }
+
     } else if (type === constants.LOGIN_TYPES.loginPassword) {
       //Если пользователь авторизуется через нашу базу
       const querySelectUserByLogin = `SELECT u."password" ,
@@ -393,6 +385,68 @@ async function login2(object, reply) {
     client.release();
     console.log("client.release");
   }
+}
+
+async function tryConnect(login, password, ldapClient1, ldapClient2, searchParams1, searchParams2, client) {
+  let data = {
+    message: "",
+    statusCode: 400,
+  }
+  try {
+    // Попытка привязки к первому домену с логином в формате EDU\\login
+    data = await tryBind(ldapClient1, "EDU\\" + login, password, searchParams1, client);
+    console.log("Подключение к первому домену успешно");
+    return data
+  } catch (err) {
+    console.log("Подключение к первому домену не удалось:", err.message);
+  }
+
+  try {
+    // Попытка привязки ко второму домену с логином в формате login@ntiustu.local
+    data = await tryBind(ldapClient2, login + "@ntiustu.local", password, searchParams2, client);
+    console.log("Подключение ко второму домену успешно");
+    return data
+  } catch (err) {
+    console.log("Подключение ко второму домену не удалось:", err.message);
+    return data
+  }
+  return {
+    message: "Неправильный логин или пароль",
+    statusCode: 400,
+  }
+}
+
+function tryBind(ldapClient, login, password, searchParams, client) {
+  return new Promise((resolve, reject) => {
+    ldapClient.bind(login, password, (err) => {
+      if (err) {
+        // Привязка не удалась
+        reject(err);
+      } else {
+        // Привязка успешна
+        // Выполнение поиска по LDAP с заданными параметрами
+        ldapClient.search(searchParams.baseDN, searchParams.opts, (err, res) => {
+          if (err) {
+            // Поиск не удался
+            reject(err);
+          } else {
+            // Поиск успешен
+            // Обработка результатов поиска
+            res.on('searchEntry', (entry) => {
+              resolve(entry.object);
+            });
+            res.on('error', (err) => {
+              console.error('Ошибка поиска:', err.message);
+              ldapClient.unbind();
+            });
+            res.on('end', (result) => {
+              ldapClient.unbind();
+            });
+          }
+        });
+      }
+    });
+  });
 }
 
 module.exports = {
