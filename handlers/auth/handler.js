@@ -282,8 +282,12 @@ async function login2(object, reply) {
           console.log(registerData);
           return (await login2(object))
         } else {
-          // const checkGroupForUser = await client.query(`SELECT "groupId" FROM users WHERE "id"=$1 AND "groupId"=$2`,[resSelectBio.rows[0].userId, resSelectGroup?.rows[0]?.id])
-          //todo: Сделать сравнение группы в бд и из директори
+          const checkGroupForUser = await client.query(`SELECT g."code" FROM users u 
+                                                        left join groups g on u."groupId" = g."id"
+                                                        WHERE u."id"=$1`,[resSelectBio.rows[0].userId])
+          if(checkGroupForUser.rows[0].code != groupCode && roleId == 4) {
+            const updateGroup = await client.query(`UPDATE users SET "groupId" = $1 WHERE "id" = $2 RETURNING *`, [querySelectGroup.rows[0].id, resSelectBio.rows[0].userId])
+          }
           const token = jwt.sign(
             {
               sAMAccountName: login,
