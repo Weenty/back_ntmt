@@ -241,7 +241,7 @@ async function deleteFolder(object, user) {
   const checkFolder = await client.query(
     `SELECT "id"
     FROM folders
-    WHERE "id" = $1 AND "userId" = $2`,
+    WHERE "id" = $1 AND "userId" = $2 AND folderId != null`,
     [folderId, user.userId]
   );
   if (checkFolder.rows.length == 0) {

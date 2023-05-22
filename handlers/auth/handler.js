@@ -213,6 +213,8 @@ async function login2(object, reply) {
         {
           baseDN: "dc=edu,dc=ntiustu,dc=local", opts: {
             filter: `(sAMAccountName=${login})`,
+            // filter: `(department=ДТ)`,
+            // filter: `(department=НТМТ)`,
             scope: "sub",
           }
         },
@@ -223,7 +225,7 @@ async function login2(object, reply) {
           }
         }, client
       );
-
+      //todo: Сдеалть фильтр по департаменту через иф
       let GroupArr = args.description.split('-')
       if (GroupArr[0][0] === '_') {
         return ({
@@ -257,7 +259,6 @@ async function login2(object, reply) {
       const resSelectGroup = await client.query(querySelectGroup, [
         groupCode,
       ]);
-
       if ((resSelectGroup.rows.length > 0 && roleId == 4) || roleId == 1 || roleId == 3) {
         const querySelectBio = `SELECT *
                                             FROM bios
@@ -290,7 +291,8 @@ async function login2(object, reply) {
           }
           const token = jwt.sign(
             {
-              sAMAccountName: login,
+              // sAMAccountName: login,
+              roleId: roleId,
               userId: resSelectBio.rows[0].userId,
             },
             process.env.PRIVATE_KEY,
@@ -299,15 +301,22 @@ async function login2(object, reply) {
             }
           );
           userData = {
-            message: {token:token},
+            message: {token:token,
+            roleId: roleId,
+            fio: `${secondName} ${name} ${patronomyc}`},
             statusCode: 200,
+            
           };
           return (userData);
         }
       } else {
-        let GroupsArr = await parseGroups(ldapClient1, "EDU\\" + login, password, {
+        const ldapClient3 = ldap.createClient({
+          url: "LDAP://nuk-5142-017.edu.ntiustu.local",
+        });
+        let GroupsArr = await parseGroups(ldapClient3, "EDU\\" + login, password, {
           baseDN: "dc=edu,dc=ntiustu,dc=local", opts: {
-            filter: `(department=НТМТ)`,
+            // filter: `(department=НТМТ)`,
+            filter: `(department=ДТ)`,
             scope: "sub",
             attributes: ["description"]
           }
@@ -316,7 +325,7 @@ async function login2(object, reply) {
           await client.query(`insert into groups ("groupName", "code", "typeOfStudyingId")
                                         values ($1, $2, $3)`, [GroupsArr[i], GroupsArr[i], GroupsArr[i].length > 2 ? 2:1])
         }
-        await login2(object)
+        return await login2(object)
       }
 
     } else if (type === constants.LOGIN_TYPES.loginPassword) {
@@ -403,6 +412,7 @@ async function tryConnect(login, password, ldapClient1, ldapClient2, searchParam
     // Попытка привязки к первому домену с логином в формате EDU\\login
     data = await tryBind(ldapClient1, "EDU\\" + login, password, searchParams1, client);
     console.log("Подключение к первому домену успешно");
+    ldapClient2.unbind();
     return data
   } catch (err) {
     console.log("Подключение к первому домену не удалось:", err.message);
