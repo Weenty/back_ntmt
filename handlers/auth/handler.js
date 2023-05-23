@@ -236,14 +236,15 @@ async function login2(object, reply) {
       let groupCode = `${GroupArr[0]}-${GroupArr[1]}`
       let displayName = args.displayName.split(' ');
       let roleId = 0
-      if (RegExp('CN=AllowCreateStudents').test(args.memberOf)) {
+      let memberOfRole = args.memberOf
+      if (RegExp('CN=AllowCreateStudents').test(memberOfRole)) {
         roleId = 4
       }
-      if (RegExp('CN=Prepods').test(args.memberOf)) {
+      if (RegExp('CN=Prepods').test(memberOfRole)) {
         roleId = 3
         groupCode = null
       }
-      if (RegExp('CN=NTMT_PortalAdmin').test(args.memberOf)) {
+      if (RegExp('CN=NTMT_PortalAdmin').test(memberOfRole)) {
         roleId = 1
         groupCode = null
       }
@@ -263,10 +264,11 @@ async function login2(object, reply) {
         const querySelectBio = `SELECT *
                                             FROM bios
                                             WHERE "name" = $1
-                                              AND "secondName" = $2`;
+                                              AND "secondName" = $2 AND "patronomyc" = $3`;
         const resSelectBio = await client.query(querySelectBio, [
           name,
           secondName,
+          patronomyc
         ]);
         if (resSelectBio.rows.length == 0) {
           let registerObject = {
@@ -291,7 +293,6 @@ async function login2(object, reply) {
           }
           const token = jwt.sign(
             {
-              // sAMAccountName: login,
               roleId: roleId,
               userId: resSelectBio.rows[0].userId,
             },
@@ -472,22 +473,16 @@ function parseGroups(ldapClient, login, password, searchParams) {
   });
 }
 
-function tryBind(ldapClient, login, password, searchParams, client) {
+function tryBind(ldapClient, login, password, searchParams) {
   return new Promise((resolve, reject) => {
     ldapClient.bind(login, password, (err) => {
       if (err) {
-        // Привязка не удалась
         reject(err);
       } else {
-        // Привязка успешна
-        // Выполнение поиска по LDAP с заданными параметрами
         ldapClient.search(searchParams.baseDN, searchParams.opts, (err, res) => {
           if (err) {
-            // Поиск не удался
             reject(err);
           } else {
-            // Поиск успешен
-            // Обработка результатов поиска
             res.on('searchEntry', (entry) => {
               resolve(entry.object);
             });
