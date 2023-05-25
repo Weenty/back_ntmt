@@ -8,7 +8,7 @@ async function selectRecordBook(object, user) {
 
   const client = await pool.connect();
   try {
-    if (user.roleId != 1 || user.roleId != 3) {
+    if (user.roleId != 1 && user.roleId != 3) {
       data = {
         message: "access denied",
         statusCode: 403,
