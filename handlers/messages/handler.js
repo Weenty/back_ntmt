@@ -119,7 +119,7 @@ async function createMessage(object, user) {
   
   const client = await pool.connect();
   const userId = user.userId;
-  if (user.roleId != 1) {
+  if (user.roleId != 1 || user.roleId != 3) {
     data = {
       message: "access denied",
       statusCode: 400,
