@@ -6,7 +6,7 @@ async function getUser(object, user, id) {
     statusCode: 400,
   };
   const client = await pool.connect();
-  if (user.roleId != 1) {
+  if (user.roleId != 1 || user.roleId != 3) {
     data = {
       message: "access denied",
       statusCode: 400,
