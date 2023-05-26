@@ -14,7 +14,7 @@ async function showUserInfo(object,user){
                                                   left join bios b on u."id" = b.id
                                                   left join groups g on u."groupId" = g.id
                                                     inner join userroles u2 on b."userId" = u2."userId"
-                                                    inner join typeofstudying t on g."typeOfStudyingId" = t."id" 
+                                                    inner join typesofstudying t on g."typeOfStudyingId" = t."id" 
                                          WHERE u."id" = $1`, [user.userId])
         if(info.rows.length > 0){
             data = {
