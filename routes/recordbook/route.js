@@ -201,5 +201,41 @@ module.exports = function (fastify, opts, next) {
         }
     })
 
+
+    fastify.route({
+        method: 'POST',
+        url: '/update_for_teacher',
+        schema: {
+            body: {
+                type: 'object',
+                properties: {
+                    recordId: {type: 'integer'},
+                    endMark: {type: 'string'},
+                },
+                required: ['recordId', 'endMark']
+            },
+            tags: ['recorkbook'],
+            response: {
+                400: {
+                    type: 'object',
+                    properties: {
+                        message: {type: 'string'},
+                        statusCode: {type: 'integer'}
+                    }
+                }
+            }
+        },
+        async handler(request, reply) {
+            const data = await job.updateForTeacher(request.body, request.info)
+            if (data.statusCode == 200) {
+                reply.status(200)
+                return data
+            } else {
+                reply.status(400)
+                return data
+            }
+        }
+    })
+
     next()
 }

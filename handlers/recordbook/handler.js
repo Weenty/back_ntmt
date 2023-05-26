@@ -248,6 +248,58 @@ async function getRecordBook(object, user) {
   return data;
 }
 
+async function updateForTeacher(object, user) {
+  let data = {
+    message: "",
+    statusCode: 400,
+  };
+  if(user.roleId != 1 && user.roleId != 3) {
+    return {
+      message: "access denied",
+      statusCode: 403,
+    }
+  }
+  const endMark = object.endMark;
+  const recordId = object.recordId;
+  const client = await pool.connect();
+  try {
+    const checkRecord = await client.query(
+      `SELECT r."endMark" FROM recordbooks r
+        inner join subjects s on s."id" = r."subjectId"
+        WHERE r."id" = $1 AND s."userId" = $2`,
+      [recordId, user.userId]
+    );
+    if (checkRecord.rows.length == 0) {
+      data = {
+        message: `Запись ${recordId} в зачетной книжке не найдена или вы не имеете к ней доступа`,
+        statusCode: 400,
+      };
+      return data;
+    }
+    if(endMark?.length > 0) {
+      const updateData = await client.query(`UPDATE recordbooks SET "endMark" = $1 WHERE "id" = $2 RETURNING *`,[endMark, recordId])
+      data = {
+        message: updateData.rows[0],
+        statusCode: 200,
+      }
+    } else {
+      data = {
+        message: "Отметка пуста",
+        statusCode: 400,
+      }
+    }
+  } catch (e) {
+    console.error(e);
+    data = {
+      message: e.message,
+      statusCode: 400,
+    };
+  } finally {
+    client.release();
+    console.log("client.release()");
+  }
+  return data;
+}
 
 async function updateRecordBook(object, user) {
   let data = {
@@ -284,7 +336,6 @@ async function updateRecordBook(object, user) {
       };
       return data;
     }
-
     const updates = [];
     const values = [];
 
@@ -391,4 +442,5 @@ module.exports = {
   createRecordBook: createRecordBook,
   deleteRecordBook: deleteRecordBook,
   selectRecordBook: selectRecordBook,
+  updateForTeacher: updateForTeacher
 };
