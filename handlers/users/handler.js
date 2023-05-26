@@ -65,12 +65,16 @@ async function getByRole(object, user) {
     return data;
   }
   try {
+    advenseRole = roleId
+    if(roleId == 3) {
+      advenseRole = 1
+    }
     const queryGetByRole= `SELECT u."id", concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio" 
       FROM users u
       left join userroles ur on u."id" = ur."userId"
       left join bios b on u."id" = b."id"
-      WHERE ur."roleId" = $1`;
-    const resQueryGetUser = await client.query(queryGetByRole, [roleId]);
+      WHERE ur."roleId" = $1 OR ur."roleId" = $2`;
+    const resQueryGetUser = await client.query(queryGetByRole, [roleId, advenseRole]);
     data = {
       message: resQueryGetUser.rows,
       statusCode: 200,
