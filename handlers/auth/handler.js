@@ -225,6 +225,9 @@ async function login2(object, reply) {
           }
         }, client
       );
+      if(args.statusCode == 400) {
+        return args
+      }
       //todo: Сдеалть фильтр по департаменту через иф
       let GroupArr = args.description.split('-')
       if (GroupArr[0][0] === '_') {
@@ -406,7 +409,7 @@ async function login2(object, reply) {
 
 async function tryConnect(login, password, ldapClient1, ldapClient2, searchParams1, searchParams2, client) {
   let data = {
-    message: "",
+    message: "Неправильный логин или пароль",
     statusCode: 400,
   }
   try {
@@ -427,10 +430,6 @@ async function tryConnect(login, password, ldapClient1, ldapClient2, searchParam
   } catch (err) {
     console.log("Подключение ко второму домену не удалось:", err.message);
     return data
-  }
-  return {
-    message: "Неправильный логин или пароль",
-    statusCode: 400,
   }
 }
 
