@@ -275,6 +275,7 @@ async function login2(object, reply) {
           secondName,
           patronomyc
         ]);
+        console.log(resSelectBio.rows.length == 0 || querySeceltLogin.rows.length == 0)
         if (resSelectBio.rows.length == 0 || querySeceltLogin.rows.length == 0) {
           let registerObject = {
             name: name,
@@ -290,12 +291,15 @@ async function login2(object, reply) {
           console.log(registerData);
           return (await login2(object))
         } else {
+          console.log('HERE')
           const checkGroupForUser = await client.query(`SELECT g."code" FROM users u 
                                                         left join groups g on u."groupId" = g."id"
                                                         WHERE u."id"=$1`,[resSelectBio.rows[0].userId])
-  
+          if(checkGroupForUser.rows[0].code != groupCode && roleId == 4) {
+            console.log('LOOO')
             const updateGroup = await client.query(`UPDATE users SET "groupId" = $1 WHERE "id" = $2 RETURNING *`, [checkGroupForUser.rows[0].id, resSelectBio.rows[0].userId])
           }
+          
           const token = jwt.sign(
             {
               roleId: roleId,
