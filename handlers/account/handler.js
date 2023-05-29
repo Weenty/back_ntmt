@@ -5,6 +5,7 @@ async function showUserInfo(object,user){
         message:'error',
         statusCode:400
     }
+    console.log(user.userId)
     const client = await pool.connect()
     try {
         const info = await client.query(`SELECT u."id"::integer as "userId",u2."roleId"::integer,

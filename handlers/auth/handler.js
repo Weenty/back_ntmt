@@ -268,14 +268,12 @@ async function login2(object, reply) {
                                             FROM bios
                                             WHERE "name" = $1
                                               AND "secondName" = $2 AND "patronomyc" = $3`;
-        const querySeceltLogin = await client.query(`SELECT login FROM users WHERE login = $1`, [login])
-        
+        const querySeceltLogin = await client.query(`SELECT * FROM users WHERE login = $1`, [login])
         const resSelectBio = await client.query(querySelectBio, [
           name,
           secondName,
           patronomyc
         ]);
-        console.log(resSelectBio.rows.length == 0 || querySeceltLogin.rows.length == 0)
         if (resSelectBio.rows.length == 0 || querySeceltLogin.rows.length == 0) {
           let registerObject = {
             name: name,
@@ -291,19 +289,17 @@ async function login2(object, reply) {
           console.log(registerData);
           return (await login2(object))
         } else {
-          console.log('HERE')
           const checkGroupForUser = await client.query(`SELECT g."code" FROM users u 
                                                         left join groups g on u."groupId" = g."id"
-                                                        WHERE u."id"=$1`,[resSelectBio.rows[0].userId])
+                                                        WHERE u."id"=$1`,[querySeceltLogin.rows[0].id])
           if(checkGroupForUser.rows[0].code != groupCode && roleId == 4) {
-            console.log('LOOO')
-            const updateGroup = await client.query(`UPDATE users SET "groupId" = $1 WHERE "id" = $2 RETURNING *`, [checkGroupForUser.rows[0].id, resSelectBio.rows[0].userId])
+            const updateGroup = await client.query(`UPDATE users SET "groupId" = $1 WHERE "id" = $2 RETURNING *`, [checkGroupForUser.rows[0].id, querySeceltLogin.rows[0].id])
           }
           
           const token = jwt.sign(
             {
               roleId: roleId,
-              userId: resSelectBio.rows[0].userId,
+              userId: querySeceltLogin.rows[0].id,
             },
             process.env.PRIVATE_KEY,
             {
