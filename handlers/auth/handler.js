@@ -268,12 +268,14 @@ async function login2(object, reply) {
                                             FROM bios
                                             WHERE "name" = $1
                                               AND "secondName" = $2 AND "patronomyc" = $3`;
+        const querySeceltLogin = await client.query(`SELECT login FROM users WHERE login = $1`, [login])
+        
         const resSelectBio = await client.query(querySelectBio, [
           name,
           secondName,
           patronomyc
         ]);
-        if (resSelectBio.rows.length == 0) {
+        if (resSelectBio.rows.length == 0 || querySeceltLogin.rows.length == 0) {
           let registerObject = {
             name: name,
             login: login,
@@ -291,8 +293,8 @@ async function login2(object, reply) {
           const checkGroupForUser = await client.query(`SELECT g."code" FROM users u 
                                                         left join groups g on u."groupId" = g."id"
                                                         WHERE u."id"=$1`,[resSelectBio.rows[0].userId])
-          if(checkGroupForUser.rows[0].code != groupCode && roleId == 4) {
-            const updateGroup = await client.query(`UPDATE users SET "groupId" = $1 WHERE "id" = $2 RETURNING *`, [querySelectGroup.rows[0].id, resSelectBio.rows[0].userId])
+  
+            const updateGroup = await client.query(`UPDATE users SET "groupId" = $1 WHERE "id" = $2 RETURNING *`, [checkGroupForUser.rows[0].id, resSelectBio.rows[0].userId])
           }
           const token = jwt.sign(
             {
@@ -327,7 +329,7 @@ async function login2(object, reply) {
         })
         for (let i = 0; i < GroupsArr.length; i++) {
           await client.query(`insert into groups ("groupName", "code", "typeOfStudyingId")
-                                        values ($1, $2, $3)`, [GroupsArr[i], GroupsArr[i], GroupsArr[i].length > 2 ? 2:1])
+                                        values ($1, $2, $3)`, [GroupsArr[i], GroupsArr[i], GroupsArr[i].split('-')[0].length > 2 ? 2:1])
         }
         return await login2(object)
       }
