@@ -227,7 +227,7 @@ async function deleteFolderRecursive(folder, userId, client) {
   }
 
   // Удаляем саму папку
-  await client.query(`DELETE FROM folders WHERE id = $1 AND "userId" = $2`, [folder.id, userId]);
+  await client.query(`DELETE FROM folders WHERE "id" = $1 AND "userId" = $2`, [folder.id, userId]);
 }
 
 async function deleteFolder(object, user) {
@@ -241,7 +241,7 @@ async function deleteFolder(object, user) {
   const checkFolder = await client.query(
     `SELECT "id"
     FROM folders
-    WHERE "id" = $1 AND "userId" = $2 AND folderId != null`,
+    WHERE "id" = $1 AND "userId" = $2 AND "folderId" != null`,
     [folderId, user.userId]
   );
   if (checkFolder.rows.length == 0) {
