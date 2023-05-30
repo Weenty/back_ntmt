@@ -419,6 +419,7 @@ async function tryConnect(login, password, ldapClient1, ldapClient2, searchParam
     data = await tryBind(ldapClient1, "EDU\\" + login, password, searchParams1, client);
     console.log("Подключение к первому домену успешно");
     ldapClient2.unbind();
+    ldapClient1.unbind();
     return data
   } catch (err) {
     console.log("Подключение к первому домену не удалось:", err.message);
