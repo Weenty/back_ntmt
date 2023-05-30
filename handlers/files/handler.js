@@ -239,12 +239,12 @@ async function deleteFolder(object, user) {
   const userId = user.userId;
   const client = await pool.connect();
   const checkFolder = await client.query(
-    `SELECT "id"
+    `SELECT *
     FROM folders
-    WHERE "id" = $1 AND "userId" = $2 AND "folderId" != null`,
-    [folderId, user.userId]
+    WHERE "id" = $1 AND "userId" = $2`,
+    [folderId, userId]
   );
-  if (checkFolder.rows.length == 0) {
+  if (checkFolder.rows.length == 0 || checkFolder.rows[0].folderId == null) {
     data = {
       message: "Папка не найдена или вы не имеете к ней доступа",
       statusCode: 400,
