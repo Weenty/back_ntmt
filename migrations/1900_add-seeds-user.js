@@ -31,13 +31,13 @@ exports.up = async pgm => {
     //     throw 'Ошибка при создании группы'
     // }
     // //password = root
-    // const user = await pgm.db.query(`insert into users ("typesId", "login", "password", "groupId")
-    //                                  values (2, 'user', '$2a$10$yqkkq19EglFc68MuNEHifuFGYfUnc9oaSlgfvp/SrnLu4dR4uvdHG',
-    //                                          ${group.rows[0].id})
-    //                                  returning "id"`);
-    // if (user.rowCount === 0 || user.rows.length === 0) {
-    //     throw 'Ошибка при создании пользователя'
-    // }
+    const user = await pgm.db.query(`insert into users ("typesId", "login", "password", "groupId")
+                                     values (2, 'user', '$2a$10$yqkkq19EglFc68MuNEHifuFGYfUnc9oaSlgfvp/SrnLu4dR4uvdHG',
+                                             null)
+                                     returning "id"`);
+    if (user.rowCount === 0 || user.rows.length === 0) {
+        throw 'Ошибка при создании пользователя'
+    }
     // const prep = await pgm.db.query(`insert into users ("typesId", "login", "password", "groupId")
     //                                  values (2, 'weentry', '$2a$10$yqkkq19EglFc68MuNEHifuFGYfUnc9oaSlgfvp/SrnLu4dR4uvdHG',
     //                                          ${group2.rows[0].id})
