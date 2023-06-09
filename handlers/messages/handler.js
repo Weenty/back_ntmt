@@ -12,7 +12,7 @@ async function getMessages(object, user, list) {
 
   try {
     const qCount = await client.query(
-      `select count(*)::integer  from usermessages where "userId" = $1`,
+      `select count(*)::integer  from usermessages where "userId" = $1 AND "view" = 1`,
       [user.userId]
     );
     const querySelectAllMessages = `SELECT *
@@ -43,6 +43,7 @@ async function getMessages(object, user, list) {
   }
   return data;
 }
+
 
 async function disableView(object, user) {
   let data = {
