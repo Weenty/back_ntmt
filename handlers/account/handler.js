@@ -10,7 +10,7 @@ async function showUserInfo(object,user){
     try {
         const info = await client.query(`SELECT u."id"::integer as "userId",u2."roleId"::integer,
         concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio",
-        g."groupName"
+        g."groupName", g."code"
  FROM users u
           left join bios b on b."userId" = u.id
           left join groups g on u."groupId" = g.id
