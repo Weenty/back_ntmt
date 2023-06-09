@@ -9,14 +9,13 @@ async function showUserInfo(object,user){
     const client = await pool.connect()
     try {
         const info = await client.query(`SELECT u."id"::integer as "userId",u2."roleId"::integer,
-                                                concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio",
-                                                g."groupName", g."code", t."type"
-                                         FROM users u
-                                                  left join bios b on u."id" = b."userId"
-                                                  left join groups g on u."groupId" = g."id"
-                                                    inner join userroles u2 on u."id" = u2."userId"
-                                                    inner join typesofstudying t on g."typeOfStudyingId" = t."id" 
-                                         WHERE u."id" = $1`, [user.userId])
+        concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio",
+        g."groupName"
+ FROM users u
+          left join bios b on b."userId" = u.id
+          left join groups g on u."groupId" = g.id
+            inner join userroles u2 on b."userId" = u2."userId"
+ WHERE u."id" = $1`, [user.userId])
         if(info.rows.length > 0){
             data = {
                 message:info.rows[0],
