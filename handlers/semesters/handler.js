@@ -31,7 +31,7 @@ async function addSemester(object, user) {
     };
     const value = object.value
 
-    if (user.userId != 1) {
+    if (user.roleId != 1) {
         data = {
             message: "access denied",
             statusCode: 403,
@@ -67,7 +67,7 @@ async function addSemester(object, user) {
     };
     const semesterId = object.semesterId
 
-    if (user.userId != 1) {
+    if (user.roleId != 1) {
         data = {
             message: "access denied",
             statusCode: 403,
@@ -112,7 +112,7 @@ async function addSemester(object, user) {
     const id = object.semesterId
     const value = object.value
 
-    if (user.userId != 1) {
+    if (user.roleId != 1) {
         data = {
             message: "access denied",
             statusCode: 403,

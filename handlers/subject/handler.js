@@ -49,8 +49,7 @@ async function addSubjct(object, user) {
     const teacherId = object.teacherId
     const examType = object.examType
     const hours = object.hours
-
-    if (user.userId != 1) {
+    if (user.roleId != 1) {
         data = {
             message: "access denied",
             statusCode: 403,
@@ -106,7 +105,7 @@ async function addSubjct(object, user) {
     };
     const subjectId = object.subjectId
 
-    if (user.userId != 1) {
+    if (user.roleId != 1) {
         data = {
             message: "access denied",
             statusCode: 403,

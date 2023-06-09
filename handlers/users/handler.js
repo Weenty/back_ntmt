@@ -72,7 +72,7 @@ async function getByRole(object, user) {
     const queryGetByRole= `SELECT u."id", concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio" 
       FROM users u
       left join userroles ur on u."id" = ur."userId"
-      left join bios b on u."id" = b."id"
+      left join bios b on u."id" = b."userId"
       WHERE ur."roleId" = $1 OR ur."roleId" = $2`;
     const resQueryGetUser = await client.query(queryGetByRole, [roleId, advenseRole]);
     data = {

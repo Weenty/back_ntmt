@@ -31,7 +31,7 @@ async function addExamType(object, user) {
     };
     const type = object.type
 
-    if (user.userId != 1) {
+    if (user.roleId != 1) {
         data = {
             message: "access denied",
             statusCode: 403,
@@ -67,7 +67,7 @@ async function addExamType(object, user) {
     };
     const examtypeId = object.examtypeId
 
-    if (user.userId != 1) {
+    if (user.roleId != 1) {
         data = {
             message: "access denied",
             statusCode: 403,
@@ -112,7 +112,7 @@ async function addExamType(object, user) {
     const id = object.examtypeId
     const type = object.type
 
-    if (user.userId != 1) {
+    if (user.roleId != 1) {
         data = {
             message: "access denied",
             statusCode: 403,

@@ -109,7 +109,7 @@ async function addSubjctsForGroups(object, user) {
     statusCode: 400,
   };
 
-  if (user.userId != 1) {
+  if (user.roleId != 1) {
     data = {
       message: "access denied",
       statusCode: 403,
@@ -176,7 +176,7 @@ async function deleteSubjectForGroup(object, user) {
   };
   const subjectGroupId = object.subjectGroupId
 
-  if (user.userId != 1) {
+  if (user.roleId != 1) {
       data = {
           message: "access denied",
           statusCode: 403,
