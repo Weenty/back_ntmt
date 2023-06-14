@@ -8,14 +8,29 @@ async function showUserInfo(object,user){
     console.log(user.userId)
     const client = await pool.connect()
     try {
-        const info = await client.query(`SELECT u."id"::integer as "userId",u2."roleId"::integer,
+        let infoQuery = ''
+        if (user.roleId == 1 || user.roleId == 3) {
+            infoQuery = `SELECT u."id"::integer as "userId",u2."roleId"::integer,
+            concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio",
+            g."groupName", g."code"
+     FROM users u
+              left join bios b on b."userId" = u.id
+              left join groups g on u."groupId" = g.id
+                inner join userroles u2 on b."userId" = u2."userId"
+     WHERE u."id" = $1`
+        }
+        else {
+            infoQuery = `SELECT u."id"::integer as "userId",u2."roleId"::integer,
         concat_ws(' ', b."secondName", b."name", b."patronomyc") as "fio",
-        g."groupName", g."code"
+        g."groupName", g."code", t."type"
  FROM users u
           left join bios b on b."userId" = u.id
           left join groups g on u."groupId" = g.id
             inner join userroles u2 on b."userId" = u2."userId"
- WHERE u."id" = $1`, [user.userId])
+            inner join typeofstudying t on g."typeOfStudyingId" = t.id
+ WHERE u."id" = $1`
+        }
+        const info = await client.query(infoQuery, [user.userId])
         if(info.rows.length > 0){
             data = {
                 message:info.rows[0],
