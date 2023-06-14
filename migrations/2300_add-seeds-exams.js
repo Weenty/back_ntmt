@@ -46,7 +46,13 @@ exports.up = async pgm => {
     if (semestr.rowCount === 0 || semestr.rows.length === 0) {
         throw 'Ошибка при добавлении семесипа'
     }
-
+    const semestr2 = await pgm.db.query(`insert into semesters ("id", "value")
+                                      values ('2', 'Весенний')
+                                      returning "id"`)
+    if (semestr2.rowCount === 0 || semestr2.rows.length === 0) {
+        throw 'Ошибка при добавлении семесипа'
+    }
+   
 };
 
 exports.down = pgm => {
