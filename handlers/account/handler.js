@@ -27,7 +27,7 @@ async function showUserInfo(object,user){
           left join bios b on b."userId" = u.id
           left join groups g on u."groupId" = g.id
             inner join userroles u2 on b."userId" = u2."userId"
-            inner join typeofstudying t on g."typeOfStudyingId" = t.id
+            inner join typesofstudying t on g."typeOfStudyingId" = t.id
  WHERE u."id" = $1`
         }
         const info = await client.query(infoQuery, [user.userId])
