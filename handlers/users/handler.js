@@ -57,13 +57,13 @@ async function getByRole(object, user) {
   };
   const roleId = object.roleId
   const client = await pool.connect();
-  if (user.roleId != 1 && user.roleId != 3) {
-    data = {
-      message: "access denied",
-      statusCode: 403,
-    };
-    return data;
-  }
+  // if (user.roleId != 1 && user.roleId != 3) {
+  //   data = {
+  //     message: "access denied",
+  //     statusCode: 403,
+  //   };
+  //   return data;
+  // }
   try {
     advenseRole = roleId
     if(roleId == 3) {

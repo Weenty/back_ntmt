@@ -4,7 +4,7 @@ exports.shorthands = undefined;
 
 exports.up = async pgm => {
     const messages = await pgm.db.query(`insert into messages ("id", "title", "text", "date", "author")
-                                      values ('1', 'ОТ ДЕПАРТА', 'У тебя экзамен, бро, нужна флюра', 'NOW()', 2)
+                                      values ('1', 'Новый тестовый сотрудник', 'Привет, ты новый преподаватель!', 'NOW()', 1)
                                       returning "id"`)
     if (messages.rowCount === 0) {
     throw 'Ошибка при создании сообщений'
