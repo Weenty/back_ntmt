@@ -356,6 +356,8 @@ async function login2(object, reply) {
                                          FROM userroles
                                          WHERE "userId" = $1`;
         const resSelectRole = await client.query(querySelectRole, [userId]);
+        console.log('СЮДА СМОТРИМ ИЗУЧАЕМ')
+        console.log(resSelectRole.rows[0])
         const roleId = resSelectRole.rows[0].roleId;
         if ((await bcrypt.compare(password, userPassword)) == true) {
           const token = await jwt.sign(
