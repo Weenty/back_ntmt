@@ -38,13 +38,13 @@ exports.up = async pgm => {
     // if (user.rowCount === 0 || user.rows.length === 0) {
     //     throw 'Ошибка при создании пользователя'
     // }
-    const prep = await pgm.db.query(`insert into users ("typesId", "login", "password", "groupId")
-                                     values (2, 'weentry', '$2a$10$yqkkq19EglFc68MuNEHifuFGYfUnc9oaSlgfvp/SrnLu4dR4uvdHG',
-                                             null)
-                                     returning "id"`);
-    if (prep.rowCount === 0 || prep.rows.length === 0) {
-        throw 'Ошибка при создании пользователя'
-    }
+    // const prep = await pgm.db.query(`insert into users ("typesId", "login", "password", "groupId")
+    //                                  values (2, 'weentry', '$2a$10$yqkkq19EglFc68MuNEHifuFGYfUnc9oaSlgfvp/SrnLu4dR4uvdHG',
+    //                                          null)
+    //                                  returning "id"`);
+    // if (prep.rowCount === 0 || prep.rows.length === 0) {
+    //     throw 'Ошибка при создании пользователя'
+    // }
 
     // const student = await pgm.db.query(`insert into users ("typesId", "login", "password", "groupId")
     //                                  values (2, 'student', '$2a$10$yqkkq19EglFc68MuNEHifuFGYfUnc9oaSlgfvp/SrnLu4dR4uvdHG',
@@ -67,11 +67,11 @@ exports.up = async pgm => {
     // if (bio.rowCount === 0) {
     //     throw 'Ошибка при создании био'
     // }
-    const bio2 = await pgm.db.query(`insert into bios ("name", "secondName", "patronomyc", "grant", "userId", "flura")
-                                    values ('Анатолий', 'Шерий', 'Владимирович', 22000, ${prep.rows[0].id}, now())`)
-    if (bio2.rowCount === 0) {
-        throw 'Ошибка при создании био'
-    }
+    // const bio2 = await pgm.db.query(`insert into bios ("name", "secondName", "patronomyc", "grant", "userId", "flura")
+    //                                 values ('Анатолий', 'Шерий', 'Владимирович', 22000, ${prep.rows[0].id}, now())`)
+    // if (bio2.rowCount === 0) {
+    //     throw 'Ошибка при создании био'
+    // }
 
     // const bio3 = await pgm.db.query(`insert into bios ("name", "secondName", "patronomyc", "grant", "userId", "flura")
     //                                 values ('Юрий', 'Табачок', 'Сергеевич', 22000, ${student.rows[0].id}, now())`)
