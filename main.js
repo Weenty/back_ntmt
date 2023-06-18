@@ -8,7 +8,10 @@ const options = {
     sharedSchemaId: '#MultipartFileType',
 }
 fastify.register(require('fastify-multipart'), options)
-fastify.register(require('fastify-cors'), {})
+fastify.register(require('fastify-cors'), {
+  origin: "*",
+  methods: ["POST", "GET", "OPTIONS"]
+})
 // Регистрируем fastify-swagger плагин
 fastify.register(require('fastify-swagger'), {
   routePrefix: '/documentation',
