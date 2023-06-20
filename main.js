@@ -7,6 +7,12 @@ const options = {
     addToBody: true,
     sharedSchemaId: '#MultipartFileType',
 }
+fastify.setErrorHandler(async (error, req, reply) => {
+  console.log('MAIN ERROR HANDLER')
+  reply.status(500)
+  reply.send()
+})
+
 fastify.register(require('fastify-multipart'), options)
 fastify.register(require('fastify-cors'), {
   origin: "*",
