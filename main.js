@@ -1,5 +1,6 @@
 const path = require('path');
 const autoload = require('fastify-autoload');
+
 const fastify = require('fastify')({
     logger: true,
 });
@@ -7,10 +8,17 @@ const options = {
     addToBody: true,
     sharedSchemaId: '#MultipartFileType',
 }
-fastify.setErrorHandler(async (error, req, reply) => {
-  console.log('MAIN ERROR HANDLER')
-  reply.status(500)
-  reply.send()
+
+fastify.setErrorHandler(function (error, request, reply) {
+  if (error instanceof fastify.errorCodes.FST_ERR_BAD_STATUS_CODE) {
+    // Log error
+    this.log.error(error)
+    // Send error response
+    reply.status(500).send({ ok: false })
+  } else {
+    // fastify will use parent error handler to handle this
+    reply.send(error)
+  }
 })
 
 fastify.register(require('fastify-multipart'), options)
