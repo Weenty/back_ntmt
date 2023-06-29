@@ -508,5 +508,6 @@ module.exports = {
   getFolderStruct: getFolderStruct,
   deleteFolder:deleteFolder,
   getMyFolder:getMyFolder,
-  getFoldersStudents:getFoldersStudents
+  getFoldersStudents:getFoldersStudents,
+  deleteFolderRecursive: deleteFolderRecursive
 };
