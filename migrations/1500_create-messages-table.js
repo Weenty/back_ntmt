@@ -5,7 +5,8 @@ exports.up = pgm => {
     pgm.createTable('messages', {
         id: {
             type: 'bigserial',
-            primaryKey: true
+            primaryKey: true,
+            auto_increment: true
         },
         title:{
             type:'varchar(150)'

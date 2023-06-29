@@ -5,7 +5,8 @@ exports.up = pgm => {
     pgm.createTable('folders', {
         id: {
             type: 'bigserial',
-            primaryKey: true
+            primaryKey: true,
+            auto_increment: true
         },
         userId: {
             type: 'bigint'

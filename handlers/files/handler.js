@@ -90,8 +90,8 @@ async function uploadFiles(object, user) {
 }
 
 async function createFolder(object, user) {
-  const queryAddFolder = `insert into folders ("id", "userId", "name", "folderId")
-      values ((SELECT MAX(id) + 1 FROM folders), $1, $2, $3) RETURNING *`;
+  const queryAddFolder = `insert into folders ("userId", "name", "folderId")
+      values ($1, $2, $3) RETURNING *`;
   let data = {
     message: "",
     statusCode: 400,

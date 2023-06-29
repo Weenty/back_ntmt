@@ -78,8 +78,8 @@ async function addSubjct(object, user) {
             return data
         }
 
-        const addSubjct = await client.query(`insert into subjects ("id", "name", "summaryHours", "examType", "userId")
-        values ((SELECT MAX(id) + 1 FROM subjects), $1, $2, $3, $4) RETURNING *`,[name, hours, examType, teacherId])
+        const addSubjct = await client.query(`insert into subjects ("name", "summaryHours", "examType", "userId")
+        values ($1, $2, $3, $4) RETURNING *`,[name, hours, examType, teacherId])
 
         return {
             message: addSubjct.rows,

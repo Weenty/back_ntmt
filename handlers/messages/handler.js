@@ -128,10 +128,10 @@ async function createMessage(object, user) {
     return data;
   }
   try {
-    const querySelectMessage = `insert into messages ("id", "title", "text", "date", "author")
-      values ((SELECT MAX(id) + 1 FROM messages), $1, $2, 'NOW()', $3) returning "id"`;
+    const querySelectMessage = `insert into messages ("title", "text", "date", "author")
+      values ($1, $2, 'NOW()', $3) returning "id"`;
 
-    const messagesuser = `insert into usermessages ("id", "userId", "messageId") values ((SELECT MAX(id) + 1 FROM usermessages), $1, $2)`;
+    const messagesuser = `insert into usermessages ("userId", "messageId") values ($1, $2)`;
     const resSelectMessage = await client.query(querySelectMessage, [
       object.title,
       object.text,

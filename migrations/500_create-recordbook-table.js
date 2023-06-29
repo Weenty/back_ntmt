@@ -5,7 +5,8 @@ exports.up = pgm => {
     pgm.createTable('recordbooks', {
         id: {
             type: 'bigserial',
-            primaryKey: true
+            primaryKey: true,
+            auto_increment: true
         },
         endMark: {
             type: 'varchar(250)',

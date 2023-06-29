@@ -119,8 +119,8 @@ async function registration(object) {
                                                   RETURNING *`;
 
           const resInsertFolder = await client.query(
-            `insert into folders ("id", "userId", "name", "folderId")
-          values ((SELECT MAX(id) + 1 FROM folders),$1, $2, null)
+            `insert into folders ("userId", "name", "folderId")
+          values ($1, $2, null)
           returning "id"`,
             [Number(resInsertUsers.rows[0].id), object.login]
           );

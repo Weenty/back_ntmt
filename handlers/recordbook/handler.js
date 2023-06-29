@@ -167,8 +167,8 @@ async function createRecordBook(object, user) {
     }
 
     const recordBook = await client.query(
-      `insert into recordbooks ("id", "endMark", "date", "userId", "subjectId", "semestrId", "year")
-                                      values ((SELECT MAX(id) + 1 FROM recordbooks), $1, $2, $3, $4, $5, $6)`,
+      `insert into recordbooks ("endMark", "date", "userId", "subjectId", "semestrId", "year")
+                                      values ($1, $2, $3, $4, $5, $6)`,
       [endMark, isoString, userId, subjectId, semestrId, year]
     );
 
