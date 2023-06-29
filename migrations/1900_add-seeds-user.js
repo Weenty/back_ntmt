@@ -10,12 +10,7 @@ exports.up = async pgm => {
     //     throw 'Ошибка при создании группы'
     // }
 
-    // const groupSubject = await pgm.db.query(`insert into groupssubjects ("groupId", "subjectId")
-    //                                   values ($1, 1)
-    //                                   returning "id"`, [group.rows[0].id])
-    // if (groupSubject.rowCount === 0 || groupSubject.rows.length === 0) {
-    //     throw 'Ошибка при создании группы'
-    // }
+
 
     // const group2 = await pgm.db.query(`insert into groups ("groupName", "code", "typeOfStudyingId")
     //                                   values ('Технологии оптимизации', 'ТО-12901', 1)

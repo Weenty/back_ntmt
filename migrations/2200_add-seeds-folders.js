@@ -3,30 +3,30 @@
 exports.shorthands = undefined;
 
 exports.up = async pgm => {
-    const folders1 = await pgm.db.query(`insert into folders ("id", "userId", "name", "folderId")
-                                      values ('1', null, 'Задание', null)
+    const folders1 = await pgm.db.query(`insert into folders ("userId", "name", "folderId")
+                                      values (null, 'Задание', null)
                                       returning "id"`)
     if (folders1.rowCount === 0 || folders1.rows.length === 0) {
         throw 'Ошибка при добавлении папок'
     }
     
-    // const folders2 = await pgm.db.query(`insert into folders ("id", "userId", "name", "folderId")
-    //                                   values ('2', '1', 'weentry', null)
+    // const folders2 = await pgm.db.query(`insert into folders ("userId", "name", "folderId")
+    //                                   values ('1', 'weentry', null)
     //                                   returning "id"`)
     // if (folders2.rowCount === 0 || folders2.rows.length === 0) {
     //     throw 'Ошибка при добавлении папок'
     // }
 
 
-    // const folders3 = await pgm.db.query(`insert into folders ("id", "userId", "name", "folderId")
-    //                                   values ('3', '3', 'student', null)
+    // const folders3 = await pgm.db.query(`insert into folders ("userId", "name", "folderId")
+    //                                   values ('3', 'student', null)
     //                                   returning "id"`)
     // if (folders3.rowCount === 0 || folders3.rows.length === 0) {
     //     throw 'Ошибка при добавлении папок'
     // }
 
-    // const folders4 = await pgm.db.query(`insert into folders ("id", "userId", "name", "folderId")
-    //                                   values ('4', '4', 'Бронникова Виктория', null)
+    // const folders4 = await pgm.db.query(`insert into folders ("userId", "name", "folderId")
+    //                                   values ('4', 'Бронникова Виктория', null)
     //                                   returning "id"`)
     // if (folders4.rowCount === 0 || folders4.rows.length === 0) {
     //     throw 'Ошибка при добавлении папок'

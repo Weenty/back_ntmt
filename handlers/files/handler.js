@@ -216,6 +216,7 @@ async function downloadFile(object, user) {
 }
 
 async function deleteFolderRecursive(folder, userId, client) {
+  console.log(folder)
   // Удаляем файлы внутри папки
   for (const file of folder.files) {
     await client.query(`DELETE FROM files WHERE id = $1 AND "userId" = $2`, [file.id, userId]);
@@ -509,5 +510,6 @@ module.exports = {
   deleteFolder:deleteFolder,
   getMyFolder:getMyFolder,
   getFoldersStudents:getFoldersStudents,
-  deleteFolderRecursive: deleteFolderRecursive
+  deleteFolderRecursive: deleteFolderRecursive,
+  createStruct:createStruct
 };
