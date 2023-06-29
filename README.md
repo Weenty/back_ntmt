@@ -10,10 +10,10 @@
 ## Как запустить?
 
 #### Ручное развертываниe:
-- Предустановить Node.js и PostgreSQL:
-- [![postgresql](https://d1q6f0aelx0por.cloudfront.net/product-logos/library-postgres-logo.png)](https://www.postgresql.org/)
-
-- [![nodejs](https://d1q6f0aelx0por.cloudfront.net/product-logos/library-node-logo.png)](https://nodejs.org/en)
+- Предустановить PostgreSQL:
+[![postgresql](https://d1q6f0aelx0por.cloudfront.net/product-logos/library-postgres-logo.png)](https://www.postgresql.org/)
+- Предустановить Node.js
+[![nodejs](https://d1q6f0aelx0por.cloudfront.net/product-logos/library-node-logo.png)](https://nodejs.org/en)
 - Создать базу данных в PostgreSQL
 - Загрузить проект
 ```bash
@@ -43,7 +43,7 @@
 ```
 ## Документация SWAGGER
 
-```
+```https
   http://localhost:3001/documentation
 ```
 
