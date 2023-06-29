@@ -10,9 +10,10 @@
 ## Как запустить?
 
 #### Ручное развертываниe:
-- Предустановить PostgreSQL:
+- Предустановить PostgreSQL и Node.js:
+*********
 [![postgresql](https://d1q6f0aelx0por.cloudfront.net/product-logos/library-postgres-logo.png)](https://www.postgresql.org/)
-- Предустановить Node.js
+*********
 [![nodejs](https://d1q6f0aelx0por.cloudfront.net/product-logos/library-node-logo.png)](https://nodejs.org/en)
 - Создать базу данных в PostgreSQL
 - Загрузить проект
