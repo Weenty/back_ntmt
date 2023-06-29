@@ -11,9 +11,9 @@
 
 #### Ручное развертываниe:
 - Предустановить Node.js и PostgreSQL:
-[![postgresql](https://d1q6f0aelx0por.cloudfront.net/product-logos/library-postgres-logo.png)](https://www.postgresql.org/)
+- [![postgresql](https://d1q6f0aelx0por.cloudfront.net/product-logos/library-postgres-logo.png)](https://www.postgresql.org/)
 
-[![nodejs](https://d1q6f0aelx0por.cloudfront.net/product-logos/library-node-logo.png)](https://nodejs.org/en)
+- [![nodejs](https://d1q6f0aelx0por.cloudfront.net/product-logos/library-node-logo.png)](https://nodejs.org/en)
 - Создать базу данных в PostgreSQL
 - Загрузить проект
 ```bash
@@ -23,9 +23,10 @@
 - Выполнить команды:
 ```bash
   npm run migrate
+```
+```bash
   npm start
 ```
-
 - Для остановки приложения:
 ```bash
   npm stop
@@ -36,11 +37,13 @@
 - Выполнить команды:
 ```bash
   git clone https://github.com/Weenty/back_ntmt.git
+```
+```bash
   docker-compose up
 ```
 ## Документация SWAGGER
 
-```http
+```
   http://localhost:3001/documentation
 ```
 
