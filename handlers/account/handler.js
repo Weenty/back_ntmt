@@ -43,7 +43,7 @@ async function showUserInfo(object,user){
             }
         }
     }catch (e) {
-        console.log(e)
+        console.log(e.message, e.stack)
     }finally {
         client.release()
     }
